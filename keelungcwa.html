@@ -137,43 +137,17 @@
             height: 100%;
             border: none;
         }
-
-        /* 手機適應 */
         @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-                align-items: center;
-            }
-            .tab {
-                width: 100%;
-                text-align: center;
-                padding: 8px;
-                font-size: 0.85em;
-            }
-            .chart-grid, .marine-grid {
-                grid-template-columns: 1fr;
-            }
-            .chart-container {
-                height: 200px;
-            }
-            .image-grid {
-                grid-template-columns: 1fr;
-            }
-            .image-container {
-                height: 250px;
-            }
-            .marine-grid .image-container {
-                height: 300px;
-            }
-            .yunbot-container, .forecast-container, .coastal-container {
-                height: 400px;
-            }
-            h1 {
-                font-size: 1.2em;
-            }
-            h3 {
-                font-size: 0.9em;
-            }
+            .tabs { flex-direction: column; align-items: center; }
+            .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
+            .chart-grid, .marine-grid { grid-template-columns: 1fr; }
+            .chart-container { height: 200px; }
+            .image-grid { grid-template-columns: 1fr; }
+            .image-container { height: 250px; }
+            .marine-grid .image-container { height: 300px; }
+            .yunbot-container, .forecast-container, .coastal-container { height: 400px; }
+            h1 { font-size: 1.2em; }
+            h3 { font-size: 0.9em; }
         }
     </style>
 </head>
@@ -182,39 +156,16 @@
 
     <!-- 分頁選單 -->
     <div class="tabs">
-        <div class="tab active" onclick="showTab('charts')">觀測時序圖 📈</div>
-        <div class="tab" onclick="showTab('weatherCharts')">氣象圖表 ☁️</div>
+        <div class="tab active" onclick="showTab('weatherCharts')">氣象圖表 ☁️</div>
         <div class="tab" onclick="showTab('marine')">海象圖表 🌊</div>
         <div class="tab" onclick="showTab('forecast')">天氣預報 ⛅</div>
         <div class="tab" onclick="showTab('coastal')">鄉鎮沿海預報 🌊</div>
         <div class="tab" onclick="showTab('yunbot')">雲寶問天氣 🤖</div>
+        <div class="tab" onclick="showTab('charts')">觀測時序圖 📈</div>
     </div>
 
-    <!-- 第 1 頁面：觀測時序圖 -->
-    <div id="charts" class="tab-content active">
-        <div class="chart-grid">
-            <div class="chart-container">
-                <h3>溫度時序圖 🌡️</h3>
-                <canvas id="temperatureChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>濕度時序圖 💧</h3>
-                <canvas id="humidityChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>風速時序圖 💨</h3>
-                <canvas id="windSpeedChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>雨量分布圖 🌧️</h3>
-                <canvas id="precipitationChart"></canvas>
-            </div>
-        </div>
-        <div id="map"></div>
-    </div>
-
-    <!-- 第 2 頁面：氣象圖表 -->
-    <div id="weatherCharts" class="tab-content">
+    <!-- 第 1 頁面：氣象圖表 -->
+    <div id="weatherCharts" class="tab-content active">
         <div class="image-grid">
             <div class="image-container">
                 <h3>雷達回波圖</h3>
@@ -230,7 +181,7 @@
             </div>
             <div class="image-container">
                 <h3>風速流場</h3>
-                <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=m/s&zoom=5&overlay=wind&product=ecmwf&level=surface&lat=24.036&lon=120.595&pressure=true&message=true" frameborder="0"></iframe>
+                <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=m/s&zoom=5&overlay=wind&product=ecmwf&level=surface&lat=24.036&lon=120.595&pressure=true&message=true" frameborder="0" allow="geolocation"></iframe>
             </div>
             <div class="image-container">
                 <h3>溫度分布圖 🌡️</h3>
@@ -239,7 +190,7 @@
         </div>
     </div>
 
-    <!-- 第 3 頁面：海象圖表 -->
+    <!-- 第 2 頁面：海象圖表 -->
     <div id="marine" class="tab-content">
         <div class="marine-grid">
             <div class="image-container">
@@ -256,12 +207,12 @@
             </div>
             <div class="image-container">
                 <h3>海溫預報與海流</h3>
-                <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=°C&metricWind=default&zoom=6&overlay=sst&product=ecmwfAnalysis&level=surface&lat=23.546&lon=121.482" frameborder="0"></iframe>
+                <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=°C&metricWind=default&zoom=6&overlay=sst&product=ecmwfAnalysis&level=surface&lat=23.546&lon=121.482" frameborder="0" allow="geolocation"></iframe>
             </div>
         </div>
     </div>
 
-    <!-- 第 4 頁面：天氣預報 -->
+    <!-- 第 3 頁面：天氣預報 -->
     <div id="forecast" class="tab-content">
         <div class="chart-grid">
             <div class="chart-container">
@@ -283,18 +234,41 @@
         </div>
     </div>
 
-    <!-- 第 5 頁面：鄉鎮沿海預報 -->
+    <!-- 第 4 頁面：鄉鎮沿海預報 -->
     <div id="coastal" class="tab-content">
         <div class="coastal-container">
             <iframe src="https://www.cwa.gov.tw/V8/C/M/TownCoastal/TownCoastal.html?cID=10017&pointID=1001705C01" frameborder="0"></iframe>
         </div>
     </div>
 
-    <!-- 第 6 頁面：雲寶問天氣 -->
+    <!-- 第 5 頁面：雲寶問天氣 -->
     <div id="yunbot" class="tab-content">
         <div class="yunbot-container">
             <iframe src="https://yunbot.cwa.gov.tw/" frameborder="0"></iframe>
         </div>
+    </div>
+
+    <!-- 第 6 頁面：觀測時序圖 -->
+    <div id="charts" class="tab-content">
+        <div class="chart-grid">
+            <div class="chart-container">
+                <h3>溫度時序圖 🌡️</h3>
+                <canvas id="temperatureChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>濕度時序圖 💧</h3>
+                <canvas id="humidityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>風速時序圖 💨</h3>
+                <canvas id="windSpeedChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>雨量分布圖 🌧️</h3>
+                <canvas id="precipitationChart"></canvas>
+            </div>
+        </div>
+        <div id="map"></div>
     </div>
 
     <script>
@@ -319,7 +293,6 @@
             'rgb(0, 128, 128)', 'rgb(255, 140, 0)', 'rgb(124, 252, 0)', 'rgb(199, 21, 133)',
             'rgb(47, 79, 79)', 'rgb(255, 228, 225)'
         ];
-
         const stations = {
             '基隆': [25.133314, 121.740475], '淡水': [25.164889, 121.448906], '七堵': [25.094819, 121.71713],
             '大武崙': [25.166676, 121.706993], '野柳': [25.20703, 121.690021], '淡水觀海': [25.184591, 121.408616],
@@ -342,48 +315,38 @@
 
         function updateImageUrls() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(Math.floor(now.getMinutes() / 10) * 10).padStart(2, '0');
+            const maxTime = new Date(now.getTime() - 10 * 60 * 1000); // 回溯10分鐘，確保最新可用檔案
+            const year = maxTime.getFullYear();
+            const month = String(maxTime.getMonth() + 1).padStart(2, '0');
+            const day = String(maxTime.getDate()).padStart(2, '0');
+            const hours = String(maxTime.getHours()).padStart(2, '0');
+            const minutes = String(Math.floor(maxTime.getMinutes() / 10) * 10).padStart(2, '0'); // 10分鐘對齊
 
-            const maxTime = new Date(now.getTime() - 30 * 60 * 1000);
-            const maxYear = maxTime.getFullYear();
-            const maxMonth = String(maxTime.getMonth() + 1).padStart(2, '0');
-            const maxDay = String(maxTime.getDate()).padStart(2, '0');
-            const maxHours = String(maxTime.getHours()).padStart(2, '0');
-            const maxMinutes = String(Math.floor(maxTime.getMinutes() / 10) * 10).padStart(2, '0');
-
-            const radarTime = `${maxYear}${maxMonth}${maxDay}${maxHours}${maxMinutes}`;
+            const radarTime = `${year}${month}${day}${hours}${minutes}`;
             document.getElementById('radarImage').src = `https://www.cwa.gov.tw/Data/radar/CV1_3600_${radarTime}.png`;
 
-            let rainfallMinutes = Math.floor(maxTime.getMinutes() / 30) * 30;
-            if (rainfallMinutes < 0) rainfallMinutes = 0;
-            const rainfallTime = `${maxYear}-${maxMonth}-${maxDay}_${maxHours}${String(rainfallMinutes).padStart(2, '0')}.QZJ8`;
+            const rainfallMinutes = String(Math.floor(maxTime.getMinutes() / 30) * 30).padStart(2, '0'); // 30分鐘對齊
+            const rainfallTime = `${year}-${month}-${day}_${hours}${rainfallMinutes}.QZJ8`;
             document.getElementById('rainfallImage').src = `https://www.cwa.gov.tw/Data/rainfall/${rainfallTime}.jpg`;
 
-            const satelliteTime = `${maxYear}-${maxMonth}-${maxDay}-${maxHours}-${maxMinutes}`;
+            const satelliteTime = `${year}-${month}-${day}-${hours}-${minutes}`;
             document.getElementById('satelliteImage').src = `https://www.cwa.gov.tw/Data/satellite/LCC_TRGB_2750/LCC_TRGB_2750-${satelliteTime}.jpg`;
 
-            const tempTime = `${maxYear}-${maxMonth}-${maxDay}_${maxHours}00`;
+            const tempTime = `${year}-${month}-${day}_${hours}00`; // 小時對齊
             document.getElementById('temperatureImage').src = `https://www.cwa.gov.tw/Data/temperature/${tempTime}.GTP8w.jpg`;
         }
 
         function updateWaveGif() {
             const now = new Date();
             const baseUrl = 'https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/';
-            
             const targetTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
             const year = targetTime.getFullYear();
             const month = String(targetTime.getMonth() + 1).padStart(2, '0');
             const day = String(targetTime.getDate()).padStart(2, '0');
-            
             const hours = targetTime.getHours();
-            const closestHour = Math.floor(hours / 6) * 6;
-            const timeString = `${year}${month}${day}${String(closestHour).padStart(2, '0')}`;
+            const closestHour = String(Math.floor(hours / 6) * 6).padStart(2, '0'); // 6小時對齊
+            const timeString = `${year}${month}${day}${closestHour}`;
             const gifUrl = `${baseUrl}${year}${month}/${timeString}/${timeString}.gif`;
-
             document.getElementById('waveGif').src = gifUrl;
         }
 
@@ -391,7 +354,6 @@
             try {
                 const response = await fetch('http://localhost:3000/data');
                 const jsonData = await response.json();
-
                 const now = new Date();
                 const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
@@ -399,14 +361,11 @@
                 jsonData.forEach((row, index) => {
                     const stationName = row.station_name;
                     if (allStations.includes(stationName)) {
-                        if (!allData[stationName]) {
-                            allData[stationName] = [];
-                        }
+                        if (!allData[stationName]) allData[stationName] = [];
                         const time = new Date(row.time);
                         if (isNaN(time.getTime())) {
                             console.warn(`無法解析時間，第 ${index} 行，站點 ${stationName}，時間值: ${row.time}`);
                         } else if (time >= twentyFourHoursAgo && time <= now) {
-                            console.log(`解析成功，站點 ${stationName}，時間: ${time}`);
                             allData[stationName].push({
                                 Time: time,
                                 AirTemperature: row.weather_elements.AirTemperature != null ? parseFloat(row.weather_elements.AirTemperature) : null,
@@ -424,7 +383,7 @@
                 updateImageUrls();
                 setInterval(updateImageUrls, 60 * 60 * 1000); // 每小時更新
                 updateWaveGif();
-                setInterval(updateWaveGif, 6 * 60 * 60 * 1000);
+                setInterval(updateWaveGif, 6 * 60 * 60 * 1000); // 每6小時更新
             } catch (error) {
                 console.error('載入資料失敗:', error);
                 document.body.innerHTML += '<p>載入資料失敗，請檢查伺服器或資料格式</p>';
@@ -437,10 +396,7 @@
             const chartType = uniqueTimes.length > 1 ? 'line' : 'bar';
 
             const datasets = {
-                temperature: [],
-                humidity: [],
-                windSpeed: [],
-                precipitation: []
+                temperature: [], humidity: [], windSpeed: [], precipitation: []
             };
 
             visibleStations.forEach((station, index) => {
@@ -486,22 +442,12 @@
                     const dailyPrecipitation = stationData
                         .filter(item => item.Precipitation != null)
                         .reduce((sum, item) => sum + item.Precipitation, 0);
-
                     let backgroundColor = 'rgb(54, 162, 235)';
-                    if (dailyPrecipitation > 200) {
-                        backgroundColor = 'rgb(255, 99, 132)';
-                    } else if (dailyPrecipitation > 80) {
-                        backgroundColor = 'rgb(255, 165, 0)';
-                    } else if (dailyPrecipitation > 40) {
-                        backgroundColor = 'rgb(255, 215, 0)';
-                    }
-
+                    if (dailyPrecipitation > 200) backgroundColor = 'rgb(255, 99, 132)';
+                    else if (dailyPrecipitation > 80) backgroundColor = 'rgb(255, 165, 0)';
+                    else if (dailyPrecipitation > 40) backgroundColor = 'rgb(255, 215, 0)';
                     if (dailyPrecipitation > 0) {
-                        latestPrecipitation.push({
-                            station: station,
-                            value: dailyPrecipitation,
-                            color: backgroundColor
-                        });
+                        latestPrecipitation.push({ station, value: dailyPrecipitation, color: backgroundColor });
                     }
                 }
             });
@@ -521,15 +467,7 @@
 
             const chartOptions = {
                 responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            font: { size: 10 },
-                            pointStyle: 'circle'
-                        }
-                    }
-                }
+                plugins: { legend: { position: 'right', labels: { font: { size: 10 }, pointStyle: 'circle' } } }
             };
 
             tempChart = new Chart(document.getElementById('temperatureChart'), {
@@ -540,22 +478,13 @@
                     scales: {
                         x: {
                             type: 'time',
-                            time: {
-                                unit: uniqueTimes.length > 1 ? 'hour' : 'minute',
-                                displayFormats: {
-                                    hour: 'MM-dd HH:mm',
-                                    minute: 'MM-dd HH:mm'
-                                }
-                            },
+                            time: { unit: uniqueTimes.length > 1 ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
                             title: { display: true, text: '時間', font: { size: 10 } },
                             min: twentyFourHoursAgo,
                             max: now,
                             ticks: { font: { size: 8 } }
                         },
-                        y: {
-                            title: { display: true, text: '溫度 (°C) 🌡️', font: { size: 10 } },
-                            ticks: { font: { size: 8 } }
-                        }
+                        y: { title: { display: true, text: '溫度 (°C) 🌡️', font: { size: 10 } }, ticks: { font: { size: 8 } } }
                     }
                 }
             });
@@ -568,24 +497,13 @@
                     scales: {
                         x: {
                             type: 'time',
-                            time: {
-                                unit: uniqueTimes.length > 1 ? 'hour' : 'minute',
-                                displayFormats: {
-                                    hour: 'MM-dd HH:mm',
-                                    minute: 'MM-dd HH:mm'
-                                }
-                            },
+                            time: { unit: uniqueTimes.length > 1 ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
                             title: { display: true, text: '時間', font: { size: 10 } },
                             min: twentyFourHoursAgo,
                             max: now,
                             ticks: { font: { size: 8 } }
                         },
-                        y: {
-                            title: { display: true, text: '相對濕度 (%) 💧', font: { size: 10 } },
-                            min: 0,
-                            max: 100,
-                            ticks: { font: { size: 8 } }
-                        }
+                        y: { title: { display: true, text: '相對濕度 (%) 💧', font: { size: 10 } }, min: 0, max: 100, ticks: { font: { size: 8 } } }
                     }
                 }
             });
@@ -598,23 +516,13 @@
                     scales: {
                         x: {
                             type: 'time',
-                            time: {
-                                unit: uniqueTimes.length > 1 ? 'hour' : 'minute',
-                                displayFormats: {
-                                    hour: 'MM-dd HH:mm',
-                                    minute: 'MM-dd HH:mm'
-                                }
-                            },
+                            time: { unit: uniqueTimes.length > 1 ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
                             title: { display: true, text: '時間', font: { size: 10 } },
                             min: twentyFourHoursAgo,
                             max: now,
                             ticks: { font: { size: 8 } }
                         },
-                        y: {
-                            title: { display: true, text: '風速 (m/s) 💨', font: { size: 10 } },
-                            min: 0,
-                            ticks: { font: { size: 8 } }
-                        }
+                        y: { title: { display: true, text: '風速 (m/s) 💨', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
                     }
                 }
             });
@@ -625,15 +533,8 @@
                 options: {
                     ...chartOptions,
                     scales: {
-                        x: {
-                            title: { display: true, text: '站點', font: { size: 10 } },
-                            ticks: { font: { size: 8 } }
-                        },
-                        y: {
-                            title: { display: true, text: '當日累積雨量 (mm) 🌧️', font: { size: 10 } },
-                            min: 0,
-                            ticks: { font: { size: 8 } }
-                        }
+                        x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 8 } } },
+                        y: { title: { display: true, text: '當日累積雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
                     }
                 }
             });
@@ -645,7 +546,7 @@
         }
 
         function initMap() {
-            const map = L.map('map').setView([25.0, 121.5], 9);
+            const map = L.map('map').setView([25.128, 121.742], 11); // 基隆市中心，縮放等級11
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '© OpenStreetMap contributors'
@@ -660,9 +561,7 @@
                             html: `<div style="background-color: ${color}; width: 10px; height: 10px; border-radius: 50%; border: 2px solid ${color};"></div>` 
                         }) 
                     }).addTo(map).bindPopup(name);
-                    marker.on('click', () => {
-                        toggleStation(name);
-                    });
+                    marker.on('click', () => toggleStation(name));
                 }
             }
         }
@@ -686,13 +585,8 @@
                 const time = new Date(now.getTime() + i * 3 * 60 * 60 * 1000);
                 forecastData.push({
                     dt: Math.floor(time.getTime() / 1000),
-                    main: {
-                        temp: 20 + Math.random() * 5 - 2.5,
-                        humidity: 70 + Math.random() * 20
-                    },
-                    wind: {
-                        speed: 2 + Math.random() * 3
-                    },
+                    main: { temp: 20 + Math.random() * 5 - 2.5, humidity: 70 + Math.random() * 20 },
+                    wind: { speed: 2 + Math.random() * 3 },
                     rain: Math.random() > 0.7 ? { '3h': Math.random() * 10 } : null
                 });
             }
@@ -708,88 +602,38 @@
 
             const chartOptions = {
                 responsive: true,
-                plugins: {
-                    legend: { position: 'top', labels: { font: { size: 10 } } }
-                },
+                plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } },
                 scales: {
-                    x: {
-                        type: 'time',
-                        time: { unit: 'hour', displayFormats: { hour: 'MM-dd HH:mm' } },
-                        title: { display: true, text: '時間', font: { size: 10 } },
-                        ticks: { font: { size: 8 } }
-                    }
+                    x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 10 } }, ticks: { font: { size: 8 } } }
                 }
             };
 
             if (forecastTempChart) forecastTempChart.destroy();
             forecastTempChart = new Chart(document.getElementById('forecastTempChart'), {
                 type: 'line',
-                data: {
-                    labels: times,
-                    datasets: [{
-                        label: '溫度 (°C) 🌡️',
-                        data: temperatures,
-                        borderColor: 'rgb(255, 99, 132)',
-                        fill: false
-                    }]
-                },
-                options: {
-                    ...chartOptions,
-                    scales: { ...chartOptions.scales, y: { title: { display: true, text: '溫度 (°C) 🌡️', font: { size: 10 } }, ticks: { font: { size: 8 } } } }
-                }
+                data: { labels: times, datasets: [{ label: '溫度 (°C) 🌡️', data: temperatures, borderColor: 'rgb(255, 99, 132)', fill: false }] },
+                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '溫度 (°C) 🌡️', font: { size: 10 } }, ticks: { font: { size: 8 } } } } }
             });
 
             if (forecastHumidityChart) forecastHumidityChart.destroy();
             forecastHumidityChart = new Chart(document.getElementById('forecastHumidityChart'), {
                 type: 'line',
-                data: {
-                    labels: times,
-                    datasets: [{
-                        label: '濕度 (%) 💧',
-                        data: humidities,
-                        borderColor: 'rgb(54, 162, 235)',
-                        fill: false
-                    }]
-                },
-                options: {
-                    ...chartOptions,
-                    scales: { ...chartOptions.scales, y: { title: { display: true, text: '濕度 (%) 💧', font: { size: 10 } }, min: 0, max: 100, ticks: { font: { size: 8 } } } }
-                }
+                data: { labels: times, datasets: [{ label: '濕度 (%) 💧', data: humidities, borderColor: 'rgb(54, 162, 235)', fill: false }] },
+                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '濕度 (%) 💧', font: { size: 10 } }, min: 0, max: 100, ticks: { font: { size: 8 } } } } }
             });
 
             if (forecastWindChart) forecastWindChart.destroy();
             forecastWindChart = new Chart(document.getElementById('forecastWindChart'), {
                 type: 'line',
-                data: {
-                    labels: times,
-                    datasets: [{
-                        label: '風速 (m/s) 💨',
-                        data: windSpeeds,
-                        borderColor: 'rgb(75, 192, 192)',
-                        fill: false
-                    }]
-                },
-                options: {
-                    ...chartOptions,
-                    scales: { ...chartOptions.scales, y: { title: { display: true, text: '風速 (m/s) 💨', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } } }
-                }
+                data: { labels: times, datasets: [{ label: '風速 (m/s) 💨', data: windSpeeds, borderColor: 'rgb(75, 192, 192)', fill: false }] },
+                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '風速 (m/s) 💨', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } } } }
             });
 
             if (forecastPrecipChart) forecastPrecipChart.destroy();
             forecastPrecipChart = new Chart(document.getElementById('forecastPrecipChart'), {
                 type: 'bar',
-                data: {
-                    labels: times,
-                    datasets: [{
-                        label: '降雨量 (mm) 🌧️',
-                        data: precipitations,
-                        backgroundColor: 'rgb(153, 102, 255)'
-                    }]
-                },
-                options: {
-                    ...chartOptions,
-                    scales: { ...chartOptions.scales, y: { title: { display: true, text: '降雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } } }
-                }
+                data: { labels: times, datasets: [{ label: '降雨量 (mm) 🌧️', data: precipitations, backgroundColor: 'rgb(153, 102, 255)' }] },
+                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '降雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } } } }
             });
         }
 
