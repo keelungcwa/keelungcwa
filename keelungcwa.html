@@ -21,7 +21,7 @@
         }
         h1 {
             font-size: 1.5em;
-            color: #000000; /* 改為黑色 */
+            color: #000000;
             text-align: center;
             margin-bottom: 15px;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -80,6 +80,7 @@
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            overflow-x: auto; /* 手機模式下提供橫向滾動 */
         }
         .image-grid {
             display: grid;
@@ -98,8 +99,10 @@
         .image-container img, .image-container iframe {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             border: none;
+            display: block; /* 手機模式置中 */
+            margin: 0 auto;
         }
         #map {
             width: 100%;
@@ -135,17 +138,30 @@
         }
         .surge-container img {
             flex: 1;
-            height: 33%;
-            object-fit: cover;
+            height: 50%;
+            object-fit: contain;
+            max-height: 100%;
         }
-        .yunbot-container, .forecast-container, .coastal-container {
+        .forecast-container {
             width: 100%;
             height: 500px;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .yunbot-container iframe, .forecast-container iframe, .coastal-container iframe {
+        .forecast-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .yunbot-container, .coastal-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .yunbot-container iframe, .coastal-container iframe {
             width: 100%;
             height: 100%;
             border: none;
@@ -163,6 +179,13 @@
         footer p {
             margin: 5px 0;
         }
+        footer a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
         @media (max-width: 768px) {
             .tabs { flex-direction: column; align-items: center; }
             .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
@@ -172,7 +195,7 @@
             .image-container { height: 250px; }
             .marine-grid .image-container { height: 300px; }
             .surge-container { height: 300px; }
-            .yunbot-container, .forecast-container, .coastal-container { height: 400px; }
+            .forecast-container, .yunbot-container, .coastal-container { height: 400px; }
             h1 { font-size: 1.2em; }
             h3 { font-size: 0.9em; }
             footer { font-size: 0.7em; }
@@ -231,12 +254,15 @@
     <div id="marine" class="tab-content">
         <div class="marine-grid">
             <div class="image-container">
-                <h3>潮浪監測圖</h3>
+                <h3>潮浪柱狀圖</h3>
                 <div class="surge-container">
-                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan01.png" alt="潮浪監測圖 01">
-                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan02.png" alt="潮浪監測圖 02">
-                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測圖 03">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan01.png" alt="潮浪柱狀圖 01">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan02.png" alt="潮浪柱狀圖 02">
                 </div>
+            </div>
+            <div class="image-container">
+                <h3>潮浪監測地圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
             </div>
             <div class="image-container">
                 <h3>潮高預報圖</h3>
@@ -259,23 +285,8 @@
 
     <!-- 第 3 頁面：天氣預報 -->
     <div id="forecast" class="tab-content">
-        <div class="chart-grid">
-            <div class="chart-container">
-                <h3>溫度預報 🌡️</h3>
-                <canvas id="forecastTempChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>濕度預報 💧</h3>
-                <canvas id="forecastHumidityChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>風速預報 💨</h3>
-                <canvas id="forecastWindChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>降雨量預報 🌧️</h3>
-                <canvas id="forecastPrecipChart"></canvas>
-            </div>
+        <div class="forecast-container">
+            <iframe src="https://www.cwa.gov.tw/V8/C/W/County/County.html?CID=10017" frameborder="0"></iframe>
         </div>
     </div>
 
@@ -297,19 +308,19 @@
     <div id="charts" class="tab-content">
         <div class="chart-grid">
             <div class="chart-container">
-                <h3>溫度時序圖 🌡️</h3>
+                <h3>溫度時序圖 🌡️（施工中）</h3>
                 <canvas id="temperatureChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>濕度時序圖 💧</h3>
+                <h3>濕度時序圖 💧（施工中）</h3>
                 <canvas id="humidityChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>風速時序圖 💨</h3>
+                <h3>風速時序圖 💨（施工中）</h3>
                 <canvas id="windSpeedChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>雨量分布圖 🌧️</h3>
+                <h3>雨量分布圖 🌧️（施工中）</h3>
                 <canvas id="precipitationChart"></canvas>
             </div>
         </div>
@@ -318,23 +329,21 @@
 
     <!-- 第 7 頁面：關於本站 -->
     <div id="about" class="tab-content">
-        <p>本網站致力於提供<strong>清晰易讀、便民實用、適合各年齡層</strong>的氣象資訊，供基隆北海岸的機關與民眾參考。我們精選來自<strong>各國與相關單位的重要氣象產品</strong>，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦、平板等不同載具順暢閱覽</strong>。</p>
-        <p>請注意，<strong>部分氣象產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並搭配官方預報參考，以確保資訊的準確性與可靠性。</p>
-        <p>我們將持續優化內容，提供即時、穩定的天氣資訊，期盼成為基隆北海岸最值得信賴的<strong>氣象好厝邊</strong>。</p>
+        <p>本網站專注於<strong>基隆北海岸及周邊地區的海氣象資訊</strong>，致力於提供<strong>清晰易讀、便民實用、適合全齡層</strong>的內容，供機關與民眾參考。精選來自<strong>各國與相關單位的重要氣象產品</strong>，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸<strong>最值得信賴的山海氣象好厝邊</strong>。</p>
+        <p>請注意，<strong>部分氣象產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並<strong>以本署官方預報為準</strong>，以確保資訊的準確性與可靠性。</p>
         <p><strong>作者：基隆氣象站 鄧乃誠</strong></p>
     </div>
 
     <!-- 底部資訊 -->
     <footer>
         <p>服務時間：08:30至17:30 地址：200基隆市仁愛區港西街6號6樓</p>
-        <p>| 電話：(02)2422-4240(代表號) | 電子郵件：keelung@cwa.gov.tw</p>
+        <p>| 電話：(02)2422-4240 | 電子郵件：<a href="mailto:keelung@cwa.gov.tw">keelung@cwa.gov.tw</a></p>
         <p>| 中央氣象署基隆氣象站 版權所有 轉載請註明出處</p>
-        <p>本網站參考時間：臺灣標準時間TST(GMT +08:00)</p>
+        <p id="visitorCount">瀏覽人次：載入中...</p>
     </footer>
 
     <script>
         let tempChart, humidityChart, windSpeedChart, precipitationChart;
-        let forecastTempChart, forecastHumidityChart, forecastWindChart, forecastPrecipChart;
         let allData = {};
         let visibleStations = ['基隆', '淡水', '七堵', '富貴角', '大坪', '八斗子', '瑞芳', '鼻頭角', '三貂角', '大武崙'];
         const allStations = [
@@ -346,13 +355,7 @@
         const colors = [
             'rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)',
             'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(0, 128, 0)', 'rgb(255, 99, 71)',
-            'rgb(144, 238, 144)', 'rgb(173, 216, 230)', 'rgb(255, 215, 0)', 'rgb(128, 0, 128)',
-            'rgb(255, 165, 0)', 'rgb(135, 206, 235)', 'rgb(255, 20, 147)', 'rgb(50, 205, 50)',
-            'rgb(255, 69, 0)', 'rgb(0, 255, 255)', 'rgb(128, 128, 0)', 'rgb(255, 182, 193)',
-            'rgb(0, 100, 0)', 'rgb(255, 0, 255)', 'rgb(0, 0, 139)', 'rgb(255, 228, 181)',
-            'rgb(0, 191, 255)', 'rgb(128, 0, 0)', 'rgb(210, 105, 30)', 'rgb(255, 105, 180)',
-            'rgb(0, 128, 128)', 'rgb(255, 140, 0)', 'rgb(124, 252, 0)', 'rgb(199, 21, 133)',
-            'rgb(47, 79, 79)', 'rgb(255, 228, 225)'
+            'rgb(144, 238, 144)', 'rgb(173, 216, 230)'
         ];
         const stations = {
             '基隆': [25.133314, 121.740475], '淡水': [25.164889, 121.448906], '七堵': [25.094819, 121.71713],
@@ -388,12 +391,26 @@
         }
 
         function loadAndPlotData() {
-            const sampleData = [
-                {"station_name": "基隆", "time": "2025-03-26T00:00:00Z", "weather_elements": {"AirTemperature": 20, "RelativeHumidity": 80, "WindSpeed": 5, "Precipitation": 2}},
-                {"station_name": "基隆", "time": "2025-03-26T01:00:00Z", "weather_elements": {"AirTemperature": 19, "RelativeHumidity": 82, "WindSpeed": 6, "Precipitation": 1}}
-            ];
             const now = new Date();
             const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const stationsToGenerate = ['基隆', '淡水', '七堵', '富貴角', '大坪', '八斗子', '瑞芳', '鼻頭角', '三貂角', '大武崙'];
+            const sampleData = [];
+
+            stationsToGenerate.forEach(station => {
+                for (let i = 0; i < 24; i++) {
+                    const time = new Date(twentyFourHoursAgo.getTime() + i * 60 * 60 * 1000);
+                    sampleData.push({
+                        station_name: station,
+                        time: time.toISOString(),
+                        weather_elements: {
+                            AirTemperature: 18 + Math.random() * 5,
+                            RelativeHumidity: 70 + Math.random() * 20,
+                            WindSpeed: 2 + Math.random() * 5,
+                            Precipitation: Math.random() > 0.7 ? Math.random() * 10 : 0
+                        }
+                    });
+                }
+            });
 
             allData = {};
             sampleData.forEach((row, index) => {
@@ -478,7 +495,6 @@
                     }
                 }
             });
-            latestPrecipitation.sort((a, b) => b.value - a.value);
             datasets.precipitation = latestPrecipitation.map(item => ({
                 label: item.station,
                 data: [{ x: item.station, y: item.value }],
@@ -579,70 +595,17 @@
             initMap();
         }
 
-        function generateFakeForecastData() {
-            const now = new Date();
-            const forecastData = [];
-            for (let i = 0; i < 40; i++) {
-                const time = new Date(now.getTime() + i * 3 * 60 * 60 * 1000);
-                forecastData.push({
-                    dt: Math.floor(time.getTime() / 1000),
-                    main: { temp: 20 + Math.random() * 5 - 2.5, humidity: 70 + Math.random() * 20 },
-                    wind: { speed: 2 + Math.random() * 3 },
-                    rain: Math.random() > 0.7 ? { '3h': Math.random() * 10 } : null
-                });
-            }
-            return { list: forecastData };
-        }
-
-        function plotForecastCharts(data) {
-            const times = data.list.map(item => new Date(item.dt * 1000));
-            const temperatures = data.list.map(item => item.main.temp);
-            const humidities = data.list.map(item => item.main.humidity);
-            const windSpeeds = data.list.map(item => item.wind.speed);
-            const precipitations = data.list.map(item => item.rain ? (item.rain['3h'] || 0) : 0);
-
-            const chartOptions = {
-                responsive: true,
-                plugins: { legend: { position: 'top', labels: { font: { size: 10 } } } },
-                scales: {
-                    x: { type: 'time', time: { unit: 'hour', displayFormats: { hour: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 10 } }, ticks: { font: { size: 8 } } }
-                }
-            };
-
-            if (forecastTempChart) forecastTempChart.destroy();
-            forecastTempChart = new Chart(document.getElementById('forecastTempChart'), {
-                type: 'line',
-                data: { labels: times, datasets: [{ label: '溫度 (°C) 🌡️', data: temperatures, borderColor: 'rgb(255, 99, 132)', fill: false }] },
-                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '溫度 (°C) 🌡️', font: { size: 10 } }, ticks: { font: { size: 8 } } } } }
-            });
-
-            if (forecastHumidityChart) forecastHumidityChart.destroy();
-            forecastHumidityChart = new Chart(document.getElementById('forecastHumidityChart'), {
-                type: 'line',
-                data: { labels: times, datasets: [{ label: '濕度 (%) 💧', data: humidities, borderColor: 'rgb(54, 162, 235)', fill: false }] },
-                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '濕度 (%) 💧', font: { size: 10 } }, min: 0, max: 100, ticks: { font: { size: 8 } } } } }
-            });
-
-            if (forecastWindChart) forecastWindChart.destroy();
-            forecastWindChart = new Chart(document.getElementById('forecastWindChart'), {
-                type: 'line',
-                data: { labels: times, datasets: [{ label: '風速 (m/s) 💨', data: windSpeeds, borderColor: 'rgb(75, 192, 192)', fill: false }] },
-                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '風速 (m/s) 💨', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } } } }
-            });
-
-            if (forecastPrecipChart) forecastPrecipChart.destroy();
-            forecastPrecipChart = new Chart(document.getElementById('forecastPrecipChart'), {
-                type: 'bar',
-                data: { labels: times, datasets: [{ label: '降雨量 (mm) 🌧️', data: precipitations, backgroundColor: 'rgb(153, 102, 255)' }] },
-                options: { ...chartOptions, scales: { ...chartOptions.scales, y: { title: { display: true, text: '降雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } } } }
-            });
+        function updateVisitorCount() {
+            let count = localStorage.getItem('visitorCount') || 0;
+            count = parseInt(count) + 1;
+            localStorage.setItem('visitorCount', count);
+            document.getElementById('visitorCount').textContent = `瀏覽人次：${count}`;
         }
 
         window.onload = () => {
             loadAndPlotData();
             initMap();
-            const fakeData = generateFakeForecastData();
-            plotForecastCharts(fakeData);
+            updateVisitorCount();
         };
     </script>
 </body>
