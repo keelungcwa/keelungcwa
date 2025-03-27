@@ -80,7 +80,7 @@
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-            overflow-x: auto; /* 手機模式下提供橫向滾動 */
+            overflow-x: auto;
         }
         .image-grid {
             display: grid;
@@ -101,7 +101,7 @@
             height: 100%;
             object-fit: contain;
             border: none;
-            display: block; /* 手機模式置中 */
+            display: block;
             margin: 0 auto;
         }
         #map {
@@ -140,7 +140,6 @@
             flex: 1;
             height: 50%;
             object-fit: contain;
-            max-height: 100%;
         }
         .forecast-container {
             width: 100%;
@@ -196,8 +195,9 @@
             .marine-grid .image-container { height: 300px; }
             .surge-container { height: 300px; }
             .forecast-container, .yunbot-container, .coastal-container { height: 400px; }
-            h1 { font-size: 1.2em; }
-            h3 { font-size: 0.9em; }
+            h1 { font-size: 1.3em; }
+            h3 { font-size: 1em; }
+            p { font-size: 0.9em; }
             footer { font-size: 0.7em; }
         }
     </style>
@@ -308,19 +308,19 @@
     <div id="charts" class="tab-content">
         <div class="chart-grid">
             <div class="chart-container">
-                <h3>溫度時序圖 🌡️（施工中）</h3>
+                <h3>溫度時序圖 🌡️</h3>
                 <canvas id="temperatureChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>濕度時序圖 💧（施工中）</h3>
+                <h3>濕度時序圖 💧</h3>
                 <canvas id="humidityChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>風速時序圖 💨（施工中）</h3>
+                <h3>風速時序圖 💨</h3>
                 <canvas id="windSpeedChart"></canvas>
             </div>
             <div class="chart-container">
-                <h3>雨量分布圖 🌧️（施工中）</h3>
+                <h3>雨量分布圖 🌧️</h3>
                 <canvas id="precipitationChart"></canvas>
             </div>
         </div>
@@ -329,8 +329,8 @@
 
     <!-- 第 7 頁面：關於本站 -->
     <div id="about" class="tab-content">
-        <p>本網站專注於<strong>基隆北海岸及周邊地區的海氣象資訊</strong>，致力於提供<strong>清晰易讀、便民實用、適合全齡層</strong>的內容，供機關與民眾參考。精選來自<strong>各國與相關單位的重要氣象產品</strong>，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸<strong>最值得信賴的山海氣象好厝邊</strong>。</p>
-        <p>請注意，<strong>部分氣象產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並<strong>以本署官方預報為準</strong>，以確保資訊的準確性與可靠性。</p>
+        <p>本網站專注於<strong>基隆北海岸的海氣象資訊</strong>，致力於提供<strong>簡易清晰、便民實用</strong>的內容，供機關與民眾參考。精選來自各單位的重要氣象產品，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸<strong>最值得信賴的山海氣象好厝邊</strong>。</p>
+        <p>請注意，<strong>部分產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並<strong>以本署官方預報為準</strong>，以確保資訊的準確性與可靠性。</p>
         <p><strong>作者：基隆氣象站 鄧乃誠</strong></p>
     </div>
 
@@ -391,48 +391,37 @@
         }
 
         function loadAndPlotData() {
-            const now = new Date();
-            const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-            const stationsToGenerate = ['基隆', '淡水', '七堵', '富貴角', '大坪', '八斗子', '瑞芳', '鼻頭角', '三貂角', '大武崙'];
-            const sampleData = [];
-
-            stationsToGenerate.forEach(station => {
-                for (let i = 0; i < 24; i++) {
-                    const time = new Date(twentyFourHoursAgo.getTime() + i * 60 * 60 * 1000);
-                    sampleData.push({
-                        station_name: station,
-                        time: time.toISOString(),
-                        weather_elements: {
-                            AirTemperature: 18 + Math.random() * 5,
-                            RelativeHumidity: 70 + Math.random() * 20,
-                            WindSpeed: 2 + Math.random() * 5,
-                            Precipitation: Math.random() > 0.7 ? Math.random() * 10 : 0
+            fetch('keelungcwa/data/keelung_data.json')
+                .then(response => response.json())
+                .then(data => {
+                    allData = {};
+                    data.forEach((row, index) => {
+                        const stationName = row.station_name;
+                        if (allStations.includes(stationName)) {
+                            if (!allData[stationName]) allData[stationName] = [];
+                            const time = new Date(row.time);
+                            if (isNaN(time.getTime())) {
+                                console.warn(`無法解析時間，第 ${index} 行，站點 ${stationName}，時間值: ${row.time}`);
+                            } else {
+                                allData[stationName].push({
+                                    Time: time,
+                                    AirTemperature: row.weather_elements.AirTemperature != null ? parseFloat(row.weather_elements.AirTemperature) : null,
+                                    RelativeHumidity: row.weather_elements.RelativeHumidity != null ? parseFloat(row.weather_elements.RelativeHumidity) : null,
+                                    WindSpeed: row.weather_elements.WindSpeed != null ? parseFloat(row.weather_elements.WindSpeed) : null,
+                                    Precipitation: row.weather_elements.Precipitation != null && parseFloat(row.weather_elements.Precipitation) >= 0 ? parseFloat(row.weather_elements.Precipitation) : null
+                                });
+                            }
                         }
                     });
-                }
-            });
 
-            allData = {};
-            sampleData.forEach((row, index) => {
-                const stationName = row.station_name;
-                if (allStations.includes(stationName)) {
-                    if (!allData[stationName]) allData[stationName] = [];
-                    const time = new Date(row.time);
-                    if (isNaN(time.getTime())) {
-                        console.warn(`無法解析時間，第 ${index} 行，站點 ${stationName}，時間值: ${row.time}`);
-                    } else if (time >= twentyFourHoursAgo && time <= now) {
-                        allData[stationName].push({
-                            Time: time,
-                            AirTemperature: row.weather_elements.AirTemperature != null ? parseFloat(row.weather_elements.AirTemperature) : null,
-                            RelativeHumidity: row.weather_elements.RelativeHumidity != null ? parseFloat(row.weather_elements.RelativeHumidity) : null,
-                            WindSpeed: row.weather_elements.WindSpeed != null ? parseFloat(row.weather_elements.WindSpeed) : null,
-                            Precipitation: row.weather_elements.Precipitation != null && parseFloat(row.weather_elements.Precipitation) >= 0 ? parseFloat(row.weather_elements.Precipitation) : null
-                        });
-                    }
-                }
-            });
+                    const now = new Date();
+                    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                    plotCharts(twentyFourHoursAgo, now);
+                })
+                .catch(error => {
+                    console.error('載入 JSON 資料失敗:', error);
+                });
 
-            plotCharts(twentyFourHoursAgo, now);
             updateWaveGif();
             setInterval(updateWaveGif, 6 * 60 * 60 * 1000);
         }
@@ -485,16 +474,15 @@
                     const stationData = allData[station];
                     const dailyPrecipitation = stationData
                         .filter(item => item.Precipitation != null)
-                        .reduce((sum, item) => sum + item.Precipitation, 0);
+                        .reduce((sum, item) => sum + item.Precipitation, 0) || 0;
                     let backgroundColor = 'rgb(54, 162, 235)';
                     if (dailyPrecipitation > 200) backgroundColor = 'rgb(255, 99, 132)';
                     else if (dailyPrecipitation > 80) backgroundColor = 'rgb(255, 165, 0)';
                     else if (dailyPrecipitation > 40) backgroundColor = 'rgb(255, 215, 0)';
-                    if (dailyPrecipitation > 0) {
-                        latestPrecipitation.push({ station, value: dailyPrecipitation, color: backgroundColor });
-                    }
+                    latestPrecipitation.push({ station, value: dailyPrecipitation, color: backgroundColor });
                 }
             });
+            latestPrecipitation.sort((a, b) => b.value - a.value);
             datasets.precipitation = latestPrecipitation.map(item => ({
                 label: item.station,
                 data: [{ x: item.station, y: item.value }],
