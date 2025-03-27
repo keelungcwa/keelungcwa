@@ -1,0 +1,34 @@
+name: Update CWA Weather Data
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"  # 每 30 分鐘執行
+  workflow_dispatch:  # 允許手動觸發
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 取得最新程式碼
+        uses: actions/checkout@v3
+
+      - name: 設定 Python 環境
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.x"
+
+      - name: 安裝 Python 依賴
+        run: pip install requests pytz
+
+      - name: 執行抓取氣象署數據
+        env:
+          CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
+        run: python fetch_cwa_data.py
+
+      - name: 更新 JSON 檔案
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add data/keelung_data.json
+          git commit -m "更新 CWA 氣象署數據" || echo "無變更，跳過 commit"
+          git push
