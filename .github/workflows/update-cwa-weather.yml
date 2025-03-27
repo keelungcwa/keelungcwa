@@ -2,7 +2,7 @@ name: Update CWA Weather Data
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 每小時執行一次
+    - cron: '*/30 * * * *'  # 每 30 分鐘執行一次
   workflow_dispatch:  # 允許手動觸發工作流程
 
 jobs:
