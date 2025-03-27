@@ -16,10 +16,12 @@
             background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%);
             color: #333;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         h1 {
             font-size: 1.5em;
-            color: #ffffff;
+            color: #000000; /* 改為黑色 */
             text-align: center;
             margin-bottom: 15px;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -125,6 +127,17 @@
             object-fit: contain;
             border: none;
         }
+        .surge-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            height: 100%;
+        }
+        .surge-container img {
+            flex: 1;
+            height: 33%;
+            object-fit: cover;
+        }
         .yunbot-container, .forecast-container, .coastal-container {
             width: 100%;
             height: 500px;
@@ -137,6 +150,19 @@
             height: 100%;
             border: none;
         }
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #2c3e50;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        footer p {
+            margin: 5px 0;
+        }
         @media (max-width: 768px) {
             .tabs { flex-direction: column; align-items: center; }
             .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
@@ -145,9 +171,11 @@
             .image-grid { grid-template-columns: 1fr; }
             .image-container { height: 250px; }
             .marine-grid .image-container { height: 300px; }
+            .surge-container { height: 300px; }
             .yunbot-container, .forecast-container, .coastal-container { height: 400px; }
             h1 { font-size: 1.2em; }
             h3 { font-size: 0.9em; }
+            footer { font-size: 0.7em; }
         }
     </style>
 </head>
@@ -162,6 +190,7 @@
         <div class="tab" onclick="showTab('coastal')">鄉鎮沿海預報 🌊</div>
         <div class="tab" onclick="showTab('yunbot')">雲寶問天氣 🤖</div>
         <div class="tab" onclick="showTab('charts')">觀測時序圖 📈</div>
+        <div class="tab" onclick="showTab('about')">關於本站</div>
     </div>
 
     <!-- 第 1 頁面：氣象圖表 -->
@@ -169,15 +198,15 @@
         <div class="image-grid">
             <div class="image-container">
                 <h3>雷達回波圖</h3>
-                <img id="radarImage" src="" alt="雷達回波">
+                <img src="https://www.cwa.gov.tw/Data/radar/CV1_TW_1000_forPreview.png" alt="雷達回波">
             </div>
             <div class="image-container">
                 <h3>累積雨量圖</h3>
-                <img id="rainfallImage" src="" alt="累積雨量圖">
+                <img src="https://www.cwa.gov.tw/Data/rainfall/QZJ_forPreview.jpg" alt="累積雨量圖">
             </div>
             <div class="image-container">
                 <h3>真實色衛星雲圖</h3>
-                <img id="satelliteImage" src="" alt="真實色衛星雲圖">
+                <img src="https://www.cwa.gov.tw/Data/satellite/TWI_TRGB_1000/TWI_TRGB_1000.jpg" alt="真實色衛星雲圖">
             </div>
             <div class="image-container">
                 <h3>風速流場</h3>
@@ -185,7 +214,15 @@
             </div>
             <div class="image-container">
                 <h3>溫度分布圖 🌡️</h3>
-                <img id="temperatureImage" src="" alt="溫度分布圖">
+                <img src="https://www.cwa.gov.tw/Data/temperature/temp_forPreview.jpg" alt="溫度分布圖">
+            </div>
+            <div class="image-container">
+                <h3>閃電觀測圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/lightning/lightning_s.jpg" alt="閃電觀測圖">
+            </div>
+            <div class="image-container">
+                <h3>地面天氣圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/FI04.png" alt="地面天氣圖">
             </div>
         </div>
     </div>
@@ -194,8 +231,12 @@
     <div id="marine" class="tab-content">
         <div class="marine-grid">
             <div class="image-container">
-                <h3>浪高監測</h3>
-                <iframe src="https://watch.ncdr.nat.gov.tw/watch_obswavemap" frameborder="0"></iframe>
+                <h3>潮浪監測圖</h3>
+                <div class="surge-container">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan01.png" alt="潮浪監測圖 01">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan02.png" alt="潮浪監測圖 02">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測圖 03">
+                </div>
             </div>
             <div class="image-container">
                 <h3>潮高預報圖</h3>
@@ -203,11 +244,15 @@
             </div>
             <div class="image-container">
                 <h3>浪高預報</h3>
-                <img id="waveGif" src="" alt="波浪動態圖">
+                <img id="waveGif" src="https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/202503/2025032500/2025032500.gif" alt="波浪動態圖">
             </div>
             <div class="image-container">
                 <h3>海溫預報與海流</h3>
                 <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=°C&metricWind=default&zoom=6&overlay=sst&product=ecmwfAnalysis&level=surface&lat=23.546&lon=121.482" frameborder="0" allow="geolocation"></iframe>
+            </div>
+            <div class="image-container">
+                <h3>波浪分析圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/FI12_Small.jpg" alt="波浪分析圖">
             </div>
         </div>
     </div>
@@ -237,7 +282,7 @@
     <!-- 第 4 頁面：鄉鎮沿海預報 -->
     <div id="coastal" class="tab-content">
         <div class="coastal-container">
-            <iframe src="https://www.cwa.gov.tw/V8/C/M/TownCoastal/TownCoastal.html?cID=10017&pointID=1001705C01" frameborder="0"></iframe>
+            <iframe src="https://www.cwa.gov.tw/V8/C/M/TownCoastal/TownCoastal.html?cID=10017&pointID=1001705C01" frameborder="0" allow="geolocation"></iframe>
         </div>
     </div>
 
@@ -270,6 +315,22 @@
         </div>
         <div id="map"></div>
     </div>
+
+    <!-- 第 7 頁面：關於本站 -->
+    <div id="about" class="tab-content">
+        <p>本網站致力於提供<strong>清晰易讀、便民實用、適合各年齡層</strong>的氣象資訊，供基隆北海岸的機關與民眾參考。我們精選來自<strong>各國與相關單位的重要氣象產品</strong>，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦、平板等不同載具順暢閱覽</strong>。</p>
+        <p>請注意，<strong>部分氣象產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並搭配官方預報參考，以確保資訊的準確性與可靠性。</p>
+        <p>我們將持續優化內容，提供即時、穩定的天氣資訊，期盼成為基隆北海岸最值得信賴的<strong>氣象好厝邊</strong>。</p>
+        <p><strong>作者：基隆氣象站 鄧乃誠</strong></p>
+    </div>
+
+    <!-- 底部資訊 -->
+    <footer>
+        <p>服務時間：08:30至17:30 地址：200基隆市仁愛區港西街6號6樓</p>
+        <p>| 電話：(02)2422-4240(代表號) | 電子郵件：keelung@cwa.gov.tw</p>
+        <p>| 中央氣象署基隆氣象站 版權所有 轉載請註明出處</p>
+        <p>本網站參考時間：臺灣標準時間TST(GMT +08:00)</p>
+    </footer>
 
     <script>
         let tempChart, humidityChart, windSpeedChart, precipitationChart;
@@ -313,29 +374,6 @@
             document.getElementById(tabId).classList.add('active');
         }
 
-        function updateImageUrls() {
-            const now = new Date();
-            const maxTime = new Date(now.getTime() - 10 * 60 * 1000); // 回溯10分鐘，確保最新可用檔案
-            const year = maxTime.getFullYear();
-            const month = String(maxTime.getMonth() + 1).padStart(2, '0');
-            const day = String(maxTime.getDate()).padStart(2, '0');
-            const hours = String(maxTime.getHours()).padStart(2, '0');
-            const minutes = String(Math.floor(maxTime.getMinutes() / 10) * 10).padStart(2, '0'); // 10分鐘對齊
-
-            const radarTime = `${year}${month}${day}${hours}${minutes}`;
-            document.getElementById('radarImage').src = `https://www.cwa.gov.tw/Data/radar/CV1_3600_${radarTime}.png`;
-
-            const rainfallMinutes = String(Math.floor(maxTime.getMinutes() / 30) * 30).padStart(2, '0'); // 30分鐘對齊
-            const rainfallTime = `${year}-${month}-${day}_${hours}${rainfallMinutes}.QZJ8`;
-            document.getElementById('rainfallImage').src = `https://www.cwa.gov.tw/Data/rainfall/${rainfallTime}.jpg`;
-
-            const satelliteTime = `${year}-${month}-${day}-${hours}-${minutes}`;
-            document.getElementById('satelliteImage').src = `https://www.cwa.gov.tw/Data/satellite/LCC_TRGB_2750/LCC_TRGB_2750-${satelliteTime}.jpg`;
-
-            const tempTime = `${year}-${month}-${day}_${hours}00`; // 小時對齊
-            document.getElementById('temperatureImage').src = `https://www.cwa.gov.tw/Data/temperature/${tempTime}.GTP8w.jpg`;
-        }
-
         function updateWaveGif() {
             const now = new Date();
             const baseUrl = 'https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/';
@@ -344,50 +382,42 @@
             const month = String(targetTime.getMonth() + 1).padStart(2, '0');
             const day = String(targetTime.getDate()).padStart(2, '0');
             const hours = targetTime.getHours();
-            const closestHour = String(Math.floor(hours / 6) * 6).padStart(2, '0'); // 6小時對齊
+            const closestHour = String(Math.floor(hours / 6) * 6).padStart(2, '0');
             const timeString = `${year}${month}${day}${closestHour}`;
-            const gifUrl = `${baseUrl}${year}${month}/${timeString}/${timeString}.gif`;
-            document.getElementById('waveGif').src = gifUrl;
+            document.getElementById('waveGif').src = `${baseUrl}${year}${month}/${timeString}/${timeString}.gif`;
         }
 
-        async function loadAndPlotData() {
-            try {
-                const response = await fetch('http://localhost:3000/data');
-                const jsonData = await response.json();
-                const now = new Date();
-                const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        function loadAndPlotData() {
+            const sampleData = [
+                {"station_name": "基隆", "time": "2025-03-26T00:00:00Z", "weather_elements": {"AirTemperature": 20, "RelativeHumidity": 80, "WindSpeed": 5, "Precipitation": 2}},
+                {"station_name": "基隆", "time": "2025-03-26T01:00:00Z", "weather_elements": {"AirTemperature": 19, "RelativeHumidity": 82, "WindSpeed": 6, "Precipitation": 1}}
+            ];
+            const now = new Date();
+            const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-                allData = {};
-                jsonData.forEach((row, index) => {
-                    const stationName = row.station_name;
-                    if (allStations.includes(stationName)) {
-                        if (!allData[stationName]) allData[stationName] = [];
-                        const time = new Date(row.time);
-                        if (isNaN(time.getTime())) {
-                            console.warn(`無法解析時間，第 ${index} 行，站點 ${stationName}，時間值: ${row.time}`);
-                        } else if (time >= twentyFourHoursAgo && time <= now) {
-                            allData[stationName].push({
-                                Time: time,
-                                AirTemperature: row.weather_elements.AirTemperature != null ? parseFloat(row.weather_elements.AirTemperature) : null,
-                                RelativeHumidity: row.weather_elements.RelativeHumidity != null ? parseFloat(row.weather_elements.RelativeHumidity) : null,
-                                WindSpeed: row.weather_elements.WindSpeed != null ? parseFloat(row.weather_elements.WindSpeed) : null,
-                                Precipitation: row.weather_elements.Precipitation != null && parseFloat(row.weather_elements.Precipitation) >= 0 
-                                    ? parseFloat(row.weather_elements.Precipitation) 
-                                    : null
-                            });
-                        }
+            allData = {};
+            sampleData.forEach((row, index) => {
+                const stationName = row.station_name;
+                if (allStations.includes(stationName)) {
+                    if (!allData[stationName]) allData[stationName] = [];
+                    const time = new Date(row.time);
+                    if (isNaN(time.getTime())) {
+                        console.warn(`無法解析時間，第 ${index} 行，站點 ${stationName}，時間值: ${row.time}`);
+                    } else if (time >= twentyFourHoursAgo && time <= now) {
+                        allData[stationName].push({
+                            Time: time,
+                            AirTemperature: row.weather_elements.AirTemperature != null ? parseFloat(row.weather_elements.AirTemperature) : null,
+                            RelativeHumidity: row.weather_elements.RelativeHumidity != null ? parseFloat(row.weather_elements.RelativeHumidity) : null,
+                            WindSpeed: row.weather_elements.WindSpeed != null ? parseFloat(row.weather_elements.WindSpeed) : null,
+                            Precipitation: row.weather_elements.Precipitation != null && parseFloat(row.weather_elements.Precipitation) >= 0 ? parseFloat(row.weather_elements.Precipitation) : null
+                        });
                     }
-                });
+                }
+            });
 
-                plotCharts(twentyFourHoursAgo, now);
-                updateImageUrls();
-                setInterval(updateImageUrls, 60 * 60 * 1000); // 每小時更新
-                updateWaveGif();
-                setInterval(updateWaveGif, 6 * 60 * 60 * 1000); // 每6小時更新
-            } catch (error) {
-                console.error('載入資料失敗:', error);
-                document.body.innerHTML += '<p>載入資料失敗，請檢查伺服器或資料格式</p>';
-            }
+            plotCharts(twentyFourHoursAgo, now);
+            updateWaveGif();
+            setInterval(updateWaveGif, 6 * 60 * 60 * 1000);
         }
 
         function plotCharts(twentyFourHoursAgo, now) {
@@ -408,7 +438,6 @@
                         borderColor: colors[index % colors.length],
                         backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
                         tension: 0.1,
-                        borderDash: [],
                         borderWidth: 2,
                         fill: false
                     });
@@ -418,7 +447,6 @@
                         borderColor: colors[index % colors.length],
                         backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
                         tension: 0.1,
-                        borderDash: [],
                         borderWidth: 2,
                         fill: false
                     });
@@ -428,7 +456,6 @@
                         borderColor: colors[index % colors.length],
                         backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
                         tension: 0.1,
-                        borderDash: [],
                         borderWidth: 2,
                         fill: false
                     });
@@ -476,14 +503,7 @@
                 options: {
                     ...chartOptions,
                     scales: {
-                        x: {
-                            type: 'time',
-                            time: { unit: uniqueTimes.length > 1 ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
-                            title: { display: true, text: '時間', font: { size: 10 } },
-                            min: twentyFourHoursAgo,
-                            max: now,
-                            ticks: { font: { size: 8 } }
-                        },
+                        x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 10 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 8 } } },
                         y: { title: { display: true, text: '溫度 (°C) 🌡️', font: { size: 10 } }, ticks: { font: { size: 8 } } }
                     }
                 }
@@ -495,14 +515,7 @@
                 options: {
                     ...chartOptions,
                     scales: {
-                        x: {
-                            type: 'time',
-                            time: { unit: uniqueTimes.length > 1 ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
-                            title: { display: true, text: '時間', font: { size: 10 } },
-                            min: twentyFourHoursAgo,
-                            max: now,
-                            ticks: { font: { size: 8 } }
-                        },
+                        x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 10 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 8 } } },
                         y: { title: { display: true, text: '相對濕度 (%) 💧', font: { size: 10 } }, min: 0, max: 100, ticks: { font: { size: 8 } } }
                     }
                 }
@@ -514,14 +527,7 @@
                 options: {
                     ...chartOptions,
                     scales: {
-                        x: {
-                            type: 'time',
-                            time: { unit: uniqueTimes.length > 1 ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
-                            title: { display: true, text: '時間', font: { size: 10 } },
-                            min: twentyFourHoursAgo,
-                            max: now,
-                            ticks: { font: { size: 8 } }
-                        },
+                        x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 10 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 8 } } },
                         y: { title: { display: true, text: '風速 (m/s) 💨', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
                     }
                 }
@@ -538,15 +544,10 @@
                     }
                 }
             });
-
-            if (uniqueTimes.length === 0) {
-                console.warn('無過去24小時的資料');
-                document.getElementById('charts').innerHTML += '<p>警告：無過去24小時的資料，請檢查 JSON 檔案</p>';
-            }
         }
 
         function initMap() {
-            const map = L.map('map').setView([25.128, 121.742], 11); // 基隆市中心，縮放等級11
+            const map = L.map('map').setView([25.128, 121.742], 11);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '© OpenStreetMap contributors'
