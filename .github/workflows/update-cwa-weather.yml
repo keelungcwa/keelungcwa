@@ -10,29 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Checkout the repository
     - name: Check out the repository
-      uses: actions/checkout@v4  # 更新到最新版本
-
-    # 2. Set up Python environment
-    - name: Set up Python
-      uses: actions/setup-python@v5  # 更新到最新版本
+      uses: actions/checkout@v4
       with:
-        python-version: '3.11'  # 指定具體版本，避免模糊的 '3.x'
+        token: ${{ secrets.GITHUB_TOKEN }}  # 明確使用 GITHUB_TOKEN
 
-    # 3. Install required dependencies
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
     - name: Install dependencies
       run: |
-        pip install requests pytz  # 只安裝必要的依賴
+        pip install requests pytz
 
-    # 4. Run the Python script to fetch weather data
     - name: Run Python script to fetch weather data
       env:
-        CWA_API_KEY: ${{ secrets.CWA_API_KEY }}  # 使用 GitHub Secrets 中的 API Key
+        CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
       run: |
         python keelung_getdata.py
 
-    # 5. Commit and push updated data
     - name: Commit and push updated data
       run: |
         git config --global user.name "GitHub Actions"
