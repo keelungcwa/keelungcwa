@@ -23,7 +23,7 @@ jobs:
     # 3. Install required dependencies
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        pip install requests pytz pandas
 
     # 4. Run the Python script to fetch weather data
     - name: Run Python script to fetch weather data
