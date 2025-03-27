@@ -2,7 +2,7 @@ name: Update CWA Weather Data
 
 on:
   schedule:
-    - cron: '0 * * * *'  # 每小時執行一次 (可以根據需求調整)
+    - cron: '0 * * * *'  # 每小時執行一次
   workflow_dispatch:  # 允許手動觸發工作流程
 
 jobs:
@@ -12,24 +12,23 @@ jobs:
     steps:
     # 1. Checkout the repository
     - name: Check out the repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4  # 更新到最新版本
 
     # 2. Set up Python environment
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5  # 更新到最新版本
       with:
-        python-version: '3.x'
+        python-version: '3.11'  # 指定具體版本，避免模糊的 '3.x'
 
     # 3. Install required dependencies
     - name: Install dependencies
       run: |
-        pip install requests pytz pandas
+        pip install requests pytz  # 只安裝必要的依賴
 
     # 4. Run the Python script to fetch weather data
     - name: Run Python script to fetch weather data
       env:
         CWA_API_KEY: ${{ secrets.CWA_API_KEY }}  # 使用 GitHub Secrets 中的 API Key
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 使用 GitHub Secrets 中的 Personal Access Token
       run: |
         python keelung_getdata.py
 
@@ -38,8 +37,6 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add data/keelung_data.json  # 確認你的資料儲存位置
-        git commit -m "更新 CWA 氣象署數據"
-        git push https://github.com/${{ github.repository }}.git HEAD:main
-      env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 使用 GitHub Secrets 中的 Token
+        git add data/keelung_data.json
+        git commit -m "更新 CWA 氣象署數據: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
+        git push
