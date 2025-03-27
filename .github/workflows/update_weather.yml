@@ -23,7 +23,7 @@ jobs:
       - name: 執行抓取氣象署數據
         env:
           CWA_API_KEY: ${{ secrets.CWA_API_KEY }}
-        run: python fetch_cwa_data.py
+        run: python keelung_getdata.py
 
       - name: 更新 JSON 檔案
         run: |
