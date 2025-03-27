@@ -2,38 +2,43 @@ name: Update CWA Weather Data
 
 on:
   schedule:
-    - cron: "*/30 * * * *"  # 每 30 分鐘執行
-  workflow_dispatch:  # 允許手動觸發
+    - cron: '0 * * * *'  # 每小時執行一次 (可以根據需求調整)
+  workflow_dispatch:  # 允許手動觸發工作流程
 
 jobs:
   update_weather:
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Checkout the repository
     - name: Check out the repository
       uses: actions/checkout@v2
 
+    # 2. Set up Python environment
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
+    # 3. Install required dependencies
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
 
+    # 4. Run the Python script to fetch weather data
     - name: Run Python script to fetch weather data
       env:
-        CWA_API_KEY: ${{ secrets.CWA_API_KEY }}  # 使用 GitHub Secrets
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 使用 Personal Access Token
+        CWA_API_KEY: ${{ secrets.CWA_API_KEY }}  # 使用 GitHub Secrets 中的 API Key
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # 使用 GitHub Secrets 中的 Personal Access Token
       run: |
         python keelung_getdata.py
 
+    # 5. Commit and push updated data
     - name: Commit and push updated data
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add data/keelung_data.json
+        git add data/keelung_data.json  # 確認你的資料儲存位置
         git commit -m "更新 CWA 氣象署數據"
         git push https://github.com/${{ github.repository }}.git HEAD:main
       env:
