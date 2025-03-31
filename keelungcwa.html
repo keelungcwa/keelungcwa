@@ -134,18 +134,26 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        .marine-grid .image-container img, .marine-grid .image-container iframe {
+        .marine-grid .image-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             border: none;
+        }
+        .marine-grid .image-container iframe {
+            width: 90%; /* 縮小至 90% */
+            height: 90%; /* 縮小至 90% */
+            object-fit: contain;
+            border: none;
+            display: block;
+            margin: 0 auto;
         }
         .surge-container {
             display: flex;
             flex-direction: column;
             gap: 5px;
             height: 100%;
-            overflow-y: auto; /* 增加 Y 軸滾軸 */
+            overflow-y: auto;
         }
         .surge-container img {
             flex: 1;
@@ -507,13 +515,14 @@
                 }
             });
             latestPrecipitation.sort((a, b) => b.value - a.value);
-            datasets.precipitation = latestPrecipitation.map(item => ({
+            const top15Precipitation = latestPrecipitation.slice(0, 15);
+            datasets.precipitation = top15Precipitation.map(item => ({
                 label: item.station,
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
                 borderColor: item.color,
                 borderWidth: 3,
-                barThickness: 10 // 橫向加粗
+                barThickness: 10
             }));
 
             if (tempChart) tempChart.destroy();
@@ -590,7 +599,7 @@
 
             for (let [name, [lat, lng]] of Object.entries(stations)) {
                 if (allStations.includes(name)) {
-                    const color = visibleStations.includes(name) ? '#0000FF' : 'gray'; // 深藍色替代藍色
+                    const color = visibleStations.includes(name) ? '#0000FF' : 'gray';
                     const marker = L.marker([lat, lng], { 
                         icon: L.divIcon({ 
                             className: 'custom-marker', 
