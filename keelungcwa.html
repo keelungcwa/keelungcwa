@@ -90,7 +90,7 @@
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-            overflow: hidden; /* 移除滾軸 */
+            overflow: hidden;
         }
         .image-grid {
             display: grid;
@@ -145,6 +145,7 @@
             flex-direction: column;
             gap: 5px;
             height: 100%;
+            overflow-y: auto; /* 增加 Y 軸滾軸 */
         }
         .surge-container img {
             flex: 1;
@@ -287,8 +288,8 @@
                 <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
             </div>
             <div class="image-container">
-                <h3>潮高預報圖</h3>
-                <img src="https://www.cwa.gov.tw/Data/marine/tide_height_CH/cht/3day/1516_1.png" alt="基隆潮位圖">
+                <h3>波浪分析圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/FI12_Small.jpg" alt="波浪分析圖">
             </div>
             <div class="image-container">
                 <h3>浪高預報</h3>
@@ -299,8 +300,8 @@
                 <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=°C&metricWind=default&zoom=6&overlay=sst&product=ecmwfAnalysis&level=surface&lat=23.546&lon=121.482" frameborder="0" allow="geolocation"></iframe>
             </div>
             <div class="image-container">
-                <h3>波浪分析圖</h3>
-                <img src="https://www.cwa.gov.tw/Data/fcst_img/FI12_Small.jpg" alt="波浪分析圖">
+                <h3>潮高預報圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/marine/tide_height_CH/cht/3day/1516_1.png" alt="基隆潮位圖">
             </div>
         </div>
     </div>
@@ -511,7 +512,8 @@
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
                 borderColor: item.color,
-                borderWidth: 3
+                borderWidth: 3,
+                barThickness: 30 // 橫向加粗
             }));
 
             if (tempChart) tempChart.destroy();
@@ -521,10 +523,10 @@
 
             const chartOptions = {
                 responsive: true,
-                maintainAspectRatio: false, // 確保圖表適應容器
+                maintainAspectRatio: false,
                 plugins: {
-                    tooltip: { enabled: true }, // 啟用工具提示
-                    legend: { position: 'top', labels: { font: { size: 10 }, pointStyle: 'circle' } } // 圖例移至上方
+                    tooltip: { enabled: true },
+                    legend: { position: 'top', labels: { font: { size: 10 }, pointStyle: 'circle' } }
                 }
             };
 
@@ -570,7 +572,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } }, // 取消右側圖例
+                    plugins: { legend: { display: false } },
                     scales: {
                         x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 8 } } },
                         y: { title: { display: true, text: '當日累積雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
@@ -588,7 +590,7 @@
 
             for (let [name, [lat, lng]] of Object.entries(stations)) {
                 if (allStations.includes(name)) {
-                    const color = visibleStations.includes(name) ? 'blue' : 'gray';
+                    const color = visibleStations.includes(name) ? '#0000FF' : 'gray'; // 深藍色替代藍色
                     const marker = L.marker([lat, lng], { 
                         icon: L.divIcon({ 
                             className: 'custom-marker', 
