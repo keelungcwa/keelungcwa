@@ -7,14 +7,14 @@ import pytz
 # 讀取 API Key（從環境變數）
 API_KEY = os.getenv("CWA_API_KEY")
 if not API_KEY:
-    raise ValueError("❌ 環境變數 CWA_API_KEY 未設定！")
+    raise ValueError("❌ 環境變數 CWA_API_KEY 未設定！請設定環境變數，例如在終端機輸入 'export CWA_API_KEY=your_key'")
 
 # API 參數
 DATA_IDS = ["O-A0003-001", "O-A0001-001"]
 FORMAT_TYPE = "JSON"
 ELEMENTS = "AirTemperature,RelativeHumidity,WindSpeed,WindDirection,Precipitation,AirPressure"
 
-# 儲存 JSON 檔案的目錄（GitHub Actions 會存放在 Repository 內）
+# 儲存 JSON 檔案的目錄
 OUTPUT_DIR = "data"
 JSON_OUTPUT_FILE = os.path.join(OUTPUT_DIR, "keelung_data.json")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -53,8 +53,14 @@ for dataid in DATA_IDS:
 
                     if entry_time >= cutoff_time:
                         # 處理數據（將 -99 替換為 None）
-                        def safe_get(element, key):
-                            return None if element.get(key, -99.0) == -99.0 else float(element[key])
+                        def safe_get(element, key, nested_key=None):
+                            if nested_key:
+                                # 處理嵌套結構，如 "Now" 中的 Precipitation
+                                nested = element.get(nested_key, {})
+                                value = nested.get(key, -99.0)
+                            else:
+                                value = element.get(key, -99.0)
+                            return None if value == -99.0 else float(value)
 
                         new_entry = {
                             "station_name": station["StationName"],
@@ -66,7 +72,7 @@ for dataid in DATA_IDS:
                                 "RelativeHumidity": safe_get(weather_elements, "RelativeHumidity"),
                                 "WindSpeed": safe_get(weather_elements, "WindSpeed"),
                                 "WindDirection": safe_get(weather_elements, "WindDirection"),
-                                "Precipitation": safe_get(weather_elements, "Precipitation"),
+                                "Precipitation": safe_get(weather_elements, "Precipitation", "Now"),  # 修改這行
                                 "AirPressure": safe_get(weather_elements, "AirPressure")
                             },
                             "source": dataid
