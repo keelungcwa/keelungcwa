@@ -141,8 +141,8 @@
             border: none;
         }
         .marine-grid .image-container iframe {
-            width: 90%; /* 縮小至 90% */
-            height: 90%; /* 縮小至 90% */
+            width: 90%;
+            height: 90%;
             object-fit: contain;
             border: none;
             display: block;
@@ -500,18 +500,18 @@
                 }
             });
 
+            // 雨量分布圖：每個站取最新一筆雨量資料，排序後取前 15 大
             const latestPrecipitation = [];
             allStations.forEach(station => {
                 if (allData[station] && allData[station].length > 0) {
                     const stationData = allData[station];
-                    const dailyPrecipitation = stationData
-                        .filter(item => item.Precipitation != null)
-                        .reduce((sum, item) => sum + item.Precipitation, 0) || 0;
+                    const latestData = stationData.sort((a, b) => b.Time - a.Time)[0]; // 取最新一筆
+                    const precipitation = latestData.Precipitation || 0;
                     let backgroundColor = 'rgb(54, 162, 235)';
-                    if (dailyPrecipitation > 200) backgroundColor = 'rgb(255, 99, 132)';
-                    else if (dailyPrecipitation > 80) backgroundColor = 'rgb(255, 165, 0)';
-                    else if (dailyPrecipitation > 40) backgroundColor = 'rgb(255, 215, 0)';
-                    latestPrecipitation.push({ station, value: dailyPrecipitation, color: backgroundColor });
+                    if (precipitation > 200) backgroundColor = 'rgb(255, 99, 132)';
+                    else if (precipitation > 80) backgroundColor = 'rgb(255, 165, 0)';
+                    else if (precipitation > 40) backgroundColor = 'rgb(255, 215, 0)';
+                    latestPrecipitation.push({ station, value: precipitation, color: backgroundColor });
                 }
             });
             latestPrecipitation.sort((a, b) => b.value - a.value);
@@ -521,8 +521,8 @@
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
                 borderColor: item.color,
-                borderWidth: 3,
-                barThickness: 10
+                borderWidth: 3
+                // 移除 barThickness，使用預設柱寬
             }));
 
             if (tempChart) tempChart.destroy();
@@ -584,7 +584,7 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 8 } } },
-                        y: { title: { display: true, text: '當日累積雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
+                        y: { title: { display: true, text: '最新雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
                     }
                 }
             });
