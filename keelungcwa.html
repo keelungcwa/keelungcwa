@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <!-- Google Analytics -->
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D74WCKD2S0"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -91,7 +90,7 @@
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
+            overflow: hidden; /* 移除滾軸 */
         }
         .image-grid {
             display: grid;
@@ -125,7 +124,7 @@
         }
         .marine-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 10px;
             height: auto;
         }
@@ -200,6 +199,9 @@
             .image-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
+            .marine-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
         @media (max-width: 768px) {
             .tabs { flex-direction: column; align-items: center; }
@@ -270,7 +272,7 @@
         </div>
     </div>
 
-    <!-- 第 2 頁面：海象圖表 -->
+    <!-- 第 2 頁面：海象圖表（2*3 佈局） -->
     <div id="marine" class="tab-content">
         <div class="marine-grid">
             <div class="image-container">
@@ -344,6 +346,7 @@
                 <canvas id="precipitationChart"></canvas>
             </div>
         </div>
+        <p style="text-align: center; font-size: 0.9em; margin-top: 10px;">點擊下方地圖標記切換測站數據</p>
         <div id="map"></div>
     </div>
 
@@ -518,7 +521,11 @@
 
             const chartOptions = {
                 responsive: true,
-                plugins: { legend: { position: 'right', labels: { font: { size: 10 }, pointStyle: 'circle' } } }
+                maintainAspectRatio: false, // 確保圖表適應容器
+                plugins: {
+                    tooltip: { enabled: true }, // 啟用工具提示
+                    legend: { position: 'top', labels: { font: { size: 10 }, pointStyle: 'circle' } } // 圖例移至上方
+                }
             };
 
             tempChart = new Chart(document.getElementById('temperatureChart'), {
@@ -562,6 +569,7 @@
                 data: { datasets: datasets.precipitation },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } }, // 取消右側圖例
                     scales: {
                         x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 8 } } },
