@@ -196,6 +196,11 @@
         footer a:hover {
             text-decoration: underline;
         }
+        @media (min-width: 769px) {
+            .image-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
         @media (max-width: 768px) {
             .tabs { flex-direction: column; align-items: center; }
             .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
@@ -259,7 +264,8 @@
                 <img src="https://www.cwa.gov.tw/Data/fcst_img/FI04.png" alt="地面天氣圖">
             </div>
             <div class="image-container">
-                <!-- 空白區塊 -->
+                <h3>定量降水預報</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/QPF_ChFcstPrecip_12_12.png" alt="定量降水預報">
             </div>
         </div>
     </div>
@@ -502,8 +508,7 @@
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
                 borderColor: item.color,
-                borderWidth: 3,
-                barThickness: 60 // 柱狀圖寬度加粗 3 倍
+                borderWidth: 3
             }));
 
             if (tempChart) tempChart.destroy();
