@@ -18,6 +18,19 @@
       gtag('config', 'G-D74WCKD2S0');
     </script>
 
+    <!-- Open Graph 設定 -->
+    <meta property="og:title" content="基隆氣象站 山海好厝邊 🌧️🏞️">
+    <meta property="og:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta property="og:image" content="https://keelungcwa.github.io/assets/keelung_weather_preview.jpg">
+    <meta property="og:url" content="https://keelungcwa.github.io/">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card 設定 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="基隆氣象站 山海好厝邊 🌧️🏞️">
+    <meta name="twitter:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta name="twitter:image" content="https://keelungcwa.github.io/assets/keelung_weather_preview.jpg">
+
     <style>
         body {
             font-family: 'Noto Sans TC', Arial, sans-serif;
@@ -86,7 +99,7 @@
         .chart-container {
             width: 100%;
             height: 250px;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: RGBA(255, 255, 255, 0.9);
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
@@ -237,7 +250,7 @@
         <div class="tab active" onclick="showTab('weatherCharts')">氣象圖表 ☁️</div>
         <div class="tab" onclick="showTab('marine')">海象圖表 🌊</div>
         <div class="tab" onclick="showTab('forecast')">天氣預報 ⛅</div>
-        <div class="tab" onclick="showTab('coastal')">鄉鎮沿海預報 🌊</div>
+        <div class="tab" onclick="showTab('coastal')">鄉鎮沿海預報 🛳️</div>
         <div class="tab" onclick="showTab('yunbot')">雲寶問天氣 🤖</div>
         <div class="tab" onclick="showTab('charts')">觀測時序圖 📈</div>
         <div class="tab" onclick="showTab('about')">關於本站</div>
@@ -263,7 +276,7 @@
                 <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=m/s&zoom=5&overlay=wind&product=ecmwf&level=surface&lat=24.036&lon=120.595&pressure=true&message=true" frameborder="0" allow="geolocation"></iframe>
             </div>
             <div class="image-container">
-                <h3>溫度分布圖 🌡️</h3>
+                <h3>溫度分布圖 </h3>
                 <img src="https://www.cwa.gov.tw/Data/temperature/temp_forPreview.jpg" alt="溫度分布圖">
             </div>
             <div class="image-container">
@@ -293,7 +306,7 @@
             </div>
             <div class="image-container">
                 <h3>潮浪監測地圖</h3>
-                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
+                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監HO測地圖">
             </div>
             <div class="image-container">
                 <h3>波浪分析圖</h3>
@@ -377,7 +390,7 @@
     <script>
         let tempChart, humidityChart, windSpeedChart, precipitationChart;
         let allData = {};
-        let visibleStations = ['基隆', '淡水', '七堵', '富貴角', '大坪', '八斗子', '瑞芳', '鼻頭角', '三貂角', '大武崙'];
+        let visibleStations = ['基隆', '淡水', '七堵', '富貴角', '大坪', '鼻頭角', '三貂角'];
         const allStations = [
             '基隆', '淡水', '七堵', '大武崙', '野柳', '淡水觀海', '石門', '水湳洞', '八斗子', '六塊厝', '田寮',
             '大坪', '基隆嶼', '白沙灣', '三貂角', '鼻頭角', '澳底', '泰平', '雙溪', '汐止', '暖暖',
@@ -522,7 +535,6 @@
                 backgroundColor: item.color,
                 borderColor: item.color,
                 borderWidth: 3
-                // 移除 barThickness，使用預設柱寬
             }));
 
             if (tempChart) tempChart.destroy();
@@ -535,7 +547,7 @@
                 maintainAspectRatio: false,
                 plugins: {
                     tooltip: { enabled: true },
-                    legend: { position: 'top', labels: { font: { size: 10 }, pointStyle: 'circle' } }
+                    legend: { position: 'right', labels: { font: { size: 10 }, pointStyle: 'circle' } }
                 }
             };
 
