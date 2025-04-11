@@ -306,7 +306,7 @@
             </div>
             <div class="image-container">
                 <h3>潮浪監測地圖</h3>
-                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
+                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監HO測地圖">
             </div>
             <div class="image-container">
                 <h3>波浪分析圖</h3>
@@ -513,7 +513,7 @@
                 }
             });
 
-            // 雨量分布圖：每個站取最新一筆雨量資料，排序後取前 10 大
+            // 雨量分布圖：每個站取最新一筆雨量資料，排序後取前 15 大
             const latestPrecipitation = [];
             allStations.forEach(station => {
                 if (allData[station] && allData[station].length > 0) {
@@ -528,8 +528,8 @@
                 }
             });
             latestPrecipitation.sort((a, b) => b.value - a.value);
-            const top10Precipitation = latestPrecipitation.slice(0, 10);
-            datasets.precipitation = top10Precipitation.map(item => ({
+            const top15Precipitation = latestPrecipitation.slice(0, 15);
+            datasets.precipitation = top15Precipitation.map(item => ({
                 label: item.station,
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
@@ -597,12 +597,6 @@
                     scales: {
                         x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 8 } } },
                         y: { title: { display: true, text: '最新雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
-                    },
-                    datasets: {
-                        bar: {
-                            barThickness: 10,
-                            maxBarThickness: 30
-                        }
                     }
                 }
             });
