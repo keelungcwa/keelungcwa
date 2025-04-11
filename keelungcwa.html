@@ -306,7 +306,7 @@
             </div>
             <div class="image-container">
                 <h3>潮浪監測地圖</h3>
-                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監HO測地圖">
+                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
             </div>
             <div class="image-container">
                 <h3>波浪分析圖</h3>
@@ -597,6 +597,12 @@
                     scales: {
                         x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 8 } } },
                         y: { title: { display: true, text: '最新雨量 (mm) 🌧️', font: { size: 10 } }, min: 0, ticks: { font: { size: 8 } } }
+                    },
+                    datasets: {
+                        bar: {
+                            barThickness: 20,
+                            maxBarThickness: 30
+                        }
                     }
                 }
             });
