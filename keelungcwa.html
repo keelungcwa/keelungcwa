@@ -513,7 +513,7 @@
                 }
             });
 
-            // 雨量分布圖：每個站取最新一筆雨量資料，排序後取前 15 大
+            // 雨量分布圖：每個站取最新一筆雨量資料，排序後取前 10 大
             const latestPrecipitation = [];
             allStations.forEach(station => {
                 if (allData[station] && allData[station].length > 0) {
@@ -528,8 +528,8 @@
                 }
             });
             latestPrecipitation.sort((a, b) => b.value - a.value);
-            const top15Precipitation = latestPrecipitation.slice(0, 15);
-            datasets.precipitation = top15Precipitation.map(item => ({
+            const top10Precipitation = latestPrecipitation.slice(0, 10);
+            datasets.precipitation = top10Precipitation.map(item => ({
                 label: item.station,
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
@@ -601,7 +601,7 @@
                     datasets: {
                         bar: {
                             barThickness: 10,
-                            maxBarThickness: 10
+                            maxBarThickness: 30
                         }
                     }
                 }
