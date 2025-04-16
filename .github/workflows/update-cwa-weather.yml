@@ -36,4 +36,5 @@ jobs:
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add data/keelung_data.json
         git commit -m "更新 CWA 氣象署數據: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
+        git pull --rebase
         git push
