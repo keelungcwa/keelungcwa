@@ -12,7 +12,7 @@ if not API_KEY:
 # API 參數
 DATA_IDS = ["O-A0003-001", "O-A0001-001"]
 FORMAT_TYPE = "JSON"
-ELEMENTS = "AirTemperature,RelativeHumidity,WindSpeed,WindDirection,Precipitation,AirPressure"
+ELEMENTS = "AirTemperature,RelativeHumidity,WindSpeed,WindDirection,Precipitation,AirPressure,Weather"
 
 # 儲存 JSON 檔案的目錄
 OUTPUT_DIR = "data"
@@ -52,14 +52,16 @@ for dataid in DATA_IDS:
                     entry_time = datetime.strptime(obs_time, "%Y-%m-%dT%H:%M:%S%z")
 
                     if entry_time >= cutoff_time:
-                        # 處理數據（將 -99 替換為 None）
+                        # 處理數據（將 -99 替換為 None，Weather 欄位保持字串）
                         def safe_get(element, key, nested_key=None):
                             if nested_key:
                                 # 處理嵌套結構，如 "Now" 中的 Precipitation
                                 nested = element.get(nested_key, {})
                                 value = nested.get(key, -99.0)
                             else:
-                                value = element.get(key, -99.0)
+                                value = element.get(key, -99.0 if key != "Weather" else None)
+                            if key == "Weather":
+                                return value if value else None  # Weather 為字串，允許空值設為 None
                             return None if value == -99.0 else float(value)
 
                         new_entry = {
@@ -72,8 +74,9 @@ for dataid in DATA_IDS:
                                 "RelativeHumidity": safe_get(weather_elements, "RelativeHumidity"),
                                 "WindSpeed": safe_get(weather_elements, "WindSpeed"),
                                 "WindDirection": safe_get(weather_elements, "WindDirection"),
-                                "Precipitation": safe_get(weather_elements, "Precipitation", "Now"),  # 修改這行
-                                "AirPressure": safe_get(weather_elements, "AirPressure")
+                                "Precipitation": safe_get(weather_elements, "Precipitation", "Now"),
+                                "AirPressure": safe_get(weather_elements, "AirPressure"),
+                                "Weather": safe_get(weather_elements, "Weather")  # 新增 Weather 欄位
                             },
                             "source": dataid
                         }
