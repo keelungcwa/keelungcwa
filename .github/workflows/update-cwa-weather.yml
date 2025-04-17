@@ -22,7 +22,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install requests pytz
+        pip install requests pytz pandas
 
     - name: Run Python script to fetch weather data
       env:
@@ -34,7 +34,11 @@ jobs:
       run: |
         git config --global user.name "GitHub Actions"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        # 拉取最新遠端變更，避免衝突
+        git fetch origin
+        git reset --hard origin/main
+
         git add data/keelung_data.json
-        git commit -m "更新 CWA 氣象署數據: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "No changes to commit"
-        git pull --rebase
+        git commit -m "更新 CWA 氣象署數據: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" || echo "沒有變更"
         git push
