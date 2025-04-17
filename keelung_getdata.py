@@ -52,9 +52,6 @@ for entry in all_data:
         print(f"⚠️ 處理資料時錯誤，跳過：{entry}，錯誤訊息：{e}")
 all_data = filtered_data
 
-# 設定 API 資料時間範圍（最近 24 小時）
-cutoff_time = taiwan_tz.localize(datetime.now()) - timedelta(hours=24)
-
 # 抓取氣象資料
 for dataid in DATA_IDS:
     url = f"https://opendata.cwa.gov.tw/api/v1/rest/datastore/{dataid}?Authorization={API_KEY}&format={FORMAT_TYPE}&elementName={ELEMENTS}"
@@ -69,39 +66,38 @@ for dataid in DATA_IDS:
                 if county_name in ["基隆市", "新北市"]:
                     weather_elements = station["WeatherElement"]
                     obs_time = station["ObsTime"]["DateTime"]
-                    entry_time = datetime.strptime(obs_time, "%Y-%m-%dT%H:%M:%S%z")
+                    # entry_time = datetime.strptime(obs_time, "%Y-%m-%dT%H:%M:%S%z")  # 不再需要檢查時間
 
-                    if entry_time >= cutoff_time:
-                        # 處理數據（將 -99 替換為 None，Weather 欄位保持字串）
-                        def safe_get(element, key, nested_key=None):
-                            if nested_key:
-                                nested = element.get(nested_key, {})
-                                value = nested.get(key, -99.0)
-                            else:
-                                value = element.get(key, -99.0 if key != "Weather" else None)
-                            if key == "Weather":
-                                return value if value else None
-                            return None if value == -99.0 else float(value)
+                    # 處理數據（將 -99 替換為 None，Weather 欄位保持字串）
+                    def safe_get(element, key, nested_key=None):
+                        if nested_key:
+                            nested = element.get(nested_key, {})
+                            value = nested.get(key, -99.0)
+                        else:
+                            value = element.get(key, -99.0 if key != "Weather" else None)
+                        if key == "Weather":
+                            return value if value else None
+                        return None if value == -99.0 else float(value)
 
-                        new_entry = {
-                            "station_name": station["StationName"],
-                            "station_id": station["StationId"],
-                            "county": county_name,
-                            "time": obs_time,
-                            "weather_elements": {
-                                "AirTemperature": safe_get(weather_elements, "AirTemperature"),
-                                "RelativeHumidity": safe_get(weather_elements, "RelativeHumidity"),
-                                "WindSpeed": safe_get(weather_elements, "WindSpeed"),
-                                "WindDirection": safe_get(weather_elements, "WindDirection"),
-                                "Precipitation": safe_get(weather_elements, "Precipitation", "Now"),
-                                "AirPressure": safe_get(weather_elements, "AirPressure"),
-                                "Weather": safe_get(weather_elements, "Weather")
-                            },
-                            "source": dataid
-                        }
-                        # 避免重複數據
-                        if not any(d["station_id"] == new_entry["station_id"] and d["time"] == new_entry["time"] for d in all_data):
-                            all_data.append(new_entry)
+                    new_entry = {
+                        "station_name": station["StationName"],
+                        "station_id": station["StationId"],
+                        "county": county_name,
+                        "time": obs_time,
+                        "weather_elements": {
+                            "AirTemperature": safe_get(weather_elements, "AirTemperature"),
+                            "RelativeHumidity": safe_get(weather_elements, "RelativeHumidity"),
+                            "WindSpeed": safe_get(weather_elements, "WindSpeed"),
+                            "WindDirection": safe_get(weather_elements, "WindDirection"),
+                            "Precipitation": safe_get(weather_elements, "Precipitation", "Now"),
+                            "AirPressure": safe_get(weather_elements, "AirPressure"),
+                            "Weather": safe_get(weather_elements, "Weather")
+                        },
+                        "source": dataid
+                    }
+                    # 避免重複數據
+                    if not any(d["station_id"] == new_entry["station_id"] and d["time"] == new_entry["time"] for d in all_data):
+                        all_data.append(new_entry)
             print(f"{dataid} 已抓取 {len(all_data)} 筆資料")
         else:
             print(f"⚠️ {dataid} API 回應格式錯誤")
