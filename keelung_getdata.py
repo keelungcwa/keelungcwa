@@ -89,15 +89,8 @@ for dataid in DATA_IDS:
     else:
         print(f"❌ {dataid} API 請求失敗，狀態碼: {response.status_code}")
 
-# 包裝輸出資料，加上 last_updated 時間（每次都會變動）
-output = {
-    "last_updated": datetime.now(taiwan_tz).strftime("%Y-%m-%d %H:%M:%S"),
-    "data": all_data
-}
-
-# 強制寫入 JSON 檔案
+# 儲存 JSON 檔案
 with open(JSON_OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(output, f, ensure_ascii=False, indent=4)
+    json.dump(all_data, f, ensure_ascii=False, indent=4)
 
 print(f"✅ 氣象資料已更新：{JSON_OUTPUT_FILE}")
-
