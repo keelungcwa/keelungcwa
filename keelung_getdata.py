@@ -25,12 +25,32 @@ taiwan_tz = pytz.timezone("Asia/Taipei")
 # 載入現有資料（如果存在）
 all_data = []
 if os.path.exists(JSON_OUTPUT_FILE):
-    with open(JSON_OUTPUT_FILE, "r", encoding="utf-8") as f:
-        all_data = json.load(f)
+    try:
+        with open(JSON_OUTPUT_FILE, "r", encoding="utf-8") as f:
+            loaded_data = json.load(f)
+            if isinstance(loaded_data, list):
+                all_data = loaded_data
+            else:
+                print(f"⚠️ {JSON_OUTPUT_FILE} 格式錯誤，非列表，將初始化為空列表")
+    except json.JSONDecodeError:
+        print(f"❌ {JSON_OUTPUT_FILE} 無法解析為 JSON，將初始化為空列表")
+    except Exception as e:
+        print(f"❌ 讀取 {JSON_OUTPUT_FILE} 時發生錯誤：{e}，將初始化為空列表")
 
 # 過濾舊資料（保留 72 小時內的資料）
 cutoff_time_72h = taiwan_tz.localize(datetime.now()) - timedelta(hours=72)
-all_data = [entry for entry in all_data if datetime.strptime(entry["time"], "%Y-%m-%dT%H:%M:%S%z") >= cutoff_time_72h]
+filtered_data = []
+for entry in all_data:
+    try:
+        if isinstance(entry, dict) and "time" in entry:
+            entry_time = datetime.strptime(entry["time"], "%Y-%m-%dT%H:%M:%S%z")
+            if entry_time >= cutoff_time_72h:
+                filtered_data.append(entry)
+        else:
+            print(f"⚠️ 跳過無效資料：{entry}")
+    except (ValueError, TypeError) as e:
+        print(f"⚠️ 處理資料時錯誤，跳過：{entry}，錯誤訊息：{e}")
+all_data = filtered_data
 
 # 設定 API 資料時間範圍（最近 24 小時）
 cutoff_time = taiwan_tz.localize(datetime.now()) - timedelta(hours=24)
@@ -55,13 +75,12 @@ for dataid in DATA_IDS:
                         # 處理數據（將 -99 替換為 None，Weather 欄位保持字串）
                         def safe_get(element, key, nested_key=None):
                             if nested_key:
-                                # 處理嵌套結構，如 "Now" 中的 Precipitation
                                 nested = element.get(nested_key, {})
                                 value = nested.get(key, -99.0)
                             else:
                                 value = element.get(key, -99.0 if key != "Weather" else None)
                             if key == "Weather":
-                                return value if value else None  # Weather 為字串，允許空值設為 None
+                                return value if value else None
                             return None if value == -99.0 else float(value)
 
                         new_entry = {
@@ -76,7 +95,7 @@ for dataid in DATA_IDS:
                                 "WindDirection": safe_get(weather_elements, "WindDirection"),
                                 "Precipitation": safe_get(weather_elements, "Precipitation", "Now"),
                                 "AirPressure": safe_get(weather_elements, "AirPressure"),
-                                "Weather": safe_get(weather_elements, "Weather")  # 新增 Weather 欄位
+                                "Weather": safe_get(weather_elements, "Weather")
                             },
                             "source": dataid
                         }
