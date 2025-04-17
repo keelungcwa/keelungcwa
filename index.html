@@ -131,8 +131,16 @@
         }
         .ranking-container th, .ranking-container td {
             padding: 8px;
-            text-align: left;
+            text-align: center;
             border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        .ranking-container th:last-child, .ranking-container td:last-child {
+            border-right: none;
+        }
+        /* 在第 4 欄（今日的時間）後加雙直線 */
+        .ranking-container th:nth-child(4), .ranking-container td:nth-child(4) {
+            border-right: 2px double #333;
         }
         .ranking-container th {
             background-color: #2980b9;
@@ -287,6 +295,12 @@
             h3 { font-size: 1em; }
             p { font-size: 0.9em; }
             footer { font-size: 0.7em; }
+            .ranking-container table {
+                font-size: 0.75em;
+            }
+            .ranking-container th, .ranking-container td {
+                padding: 5px;
+            }
         }
     </style>
 </head>
@@ -300,7 +314,7 @@
     <div class="tabs">
         <div class="tab active" onclick="showTab('weatherCharts')">天氣圖資 ☁️</div>
         <div class="tab" onclick="showTab('marine')">海象圖資 🌊</div>
-        <div class="tab" onclick="showTab('charts')">觀測時序圖 📈</div>
+        <div class="tab" onclick="showTab('charts')">基隆北海岸❤️</div>
         <div class="tab" onclick="showTab('forecast')">天氣預報 ⛅</div>
         <div class="tab" onclick="showTab('coastal')">鄉鎮沿海預報 🛳️</div>
         <div class="tab" onclick="showTab('yunbot')">雲寶問天氣 🤖</div>
@@ -378,7 +392,7 @@
         </div>
     </div>
 
-    <!-- 第 3 頁面：觀測時序圖 -->
+    <!-- 第 3 頁面：基隆北海岸 -->
     <div id="charts" class="tab-content">
         <div class="chart-grid">
             <div class="ranking-container">
@@ -392,7 +406,11 @@
                 <table id="rankingTable">
                     <thead>
                         <tr>
-                            <th>項目</th>
+                            <th>今日</th>
+                            <th>站點</th>
+                            <th>數值</th>
+                            <th>時間</th>
+                            <th>現在</th>
                             <th>站點</th>
                             <th>數值</th>
                             <th>時間</th>
@@ -459,11 +477,11 @@
             </div>
             <div class="image-container">
                 <h3>圖卡3</h3>
-                <img src="https://www.cwa.gov.tw/Data/station/hoping_island.jpg" alt="圖卡3">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image3.png" alt="圖卡3">
             </div>
             <div class="image-container">
                 <h3>圖卡4</h3>
-                <img src="https://www.cwa.gov.tw/Data/station/keelung_island.jpg" alt="圖卡4">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image4.png" alt="圖卡4">
             </div>
         </div>
     </div>
@@ -513,9 +531,10 @@
             '五分山': [25.071182, 121.781205]
         };
         const weatherEmojis = {
-            '晴': '☀️',
-            '多雲': '☁️',
-            '陰': '🌥️',
+            '晴': '☀️', // 06:00~18:00
+            '晚晴': '🌙', // 18:00~06:00
+            '多雲': '🌥️',
+            '陰': '☁️',
             '雨': '🌧️',
             '雷雨': '⛈️',
             '靄': '🌫️',
@@ -593,7 +612,7 @@
                 .catch(error => {
                     console.error('載入 JSON 資料失敗:', error);
                     document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
-                    document.getElementById('rankingTable').querySelector('tbody').innerHTML = '<tr><td colspan="4">暫無排行資料</td></tr>';
+                    document.getElementById('rankingTable').querySelector('tbody').innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
                     document.getElementById('map').innerHTML = '<p style="text-align: center; color: #666;">暫無地圖資料</p>';
                 });
 
@@ -610,16 +629,23 @@
 
             const latestData = keelungData.sort((a, b) => b.Time - a.Time)[0];
             const date = latestData.Time;
+            const hours = date.getHours();
             const weather = latestData.Weather || '未知';
             const temperature = latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A';
             const humidity = latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A';
             const precipitation = latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A';
             const windSpeed = latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A';
-            const timeStr = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            const timeStr = `${hours.toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
             
-            const weatherEmoji = weatherEmojis[weather] || '❓';
+            let displayWeather = weather;
+            if (weather === '晴') {
+                displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+            }
+            const weatherEmoji = weatherEmojis[displayWeather] || '❓';
+            
             const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-            const dateStr = `2025年4月16日 (${weekdays[date.getDay()]})`;
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
 
             document.getElementById('latestWeather').innerHTML = 
                 `${dateStr} ${weather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
@@ -641,41 +667,74 @@
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
 
-            const ranking = [];
+            const todayRanking = [];
             allStations.forEach(station => {
                 if (allData[station] && allData[station].length > 0) {
                     const todayData = allData[station].filter(d => d.Time >= today && d.Time < tomorrow);
                     if (todayData.length > 0) {
-                        const latestData = todayData.sort((a, b) => b.Time - a.Time)[0];
-                        const value = sortType === 'maxTemperature' ? latestData.AirTemperature :
-                                      sortType === 'minTemperature' ? latestData.AirTemperature :
-                                      sortType === 'windSpeed' ? latestData.WindSpeed :
-                                      latestData.Precipitation;
-                        if (value != null && (sortType !== 'precipitation' || value >= 0)) {
-                            ranking.push({
+                        const value = sortType === 'maxTemperature' ? Math.max(...todayData.map(d => d.AirTemperature).filter(v => v != null)) :
+                                      sortType === 'minTemperature' ? Math.min(...todayData.map(d => d.AirTemperature).filter(v => v != null)) :
+                                      sortType === 'windSpeed' ? Math.max(...todayData.map(d => d.WindSpeed).filter(v => v != null)) :
+                                      Math.max(...todayData.map(d => d.Precipitation).filter(v => v != null && v >= 0));
+                        const dataPoint = todayData.find(d => 
+                            (sortType === 'maxTemperature' && d.AirTemperature === value) ||
+                            (sortType === 'minTemperature' && d.AirTemperature === value) ||
+                            (sortType === 'windSpeed' && d.WindSpeed === value) ||
+                            (sortType === 'precipitation' && d.Precipitation === value)
+                        );
+                        if (value != null && !isNaN(value) && dataPoint) {
+                            todayRanking.push({
                                 station,
                                 value,
-                                time: latestData.Time
+                                time: dataPoint.Time
                             });
                         }
                     }
                 }
             });
 
-            ranking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5).forEach(item => {
-                const row = document.createElement('tr');
-                const timeStr = `${item.time.getHours().toString().padStart(2, '0')}:${item.time.getMinutes().toString().padStart(2, '0')}`;
-                row.innerHTML = `
-                    <td>${sortType === 'maxTemperature' ? '最高溫 (°C)' : sortType === 'minTemperature' ? '最低溫 (°C)' : sortType === 'windSpeed' ? '風速 (m/s)' : '雨量 (mm)'}</td>
-                    <td>${item.station}</td>
-                    <td>${item.value.toFixed(1)}</td>
-                    <td>${timeStr}</td>
-                `;
-                tableBody.appendChild(row);
+            const nowRanking = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const latestData = allData[station].sort((a, b) => b.Time - a.Time)[0];
+                    const value = sortType === 'maxTemperature' ? latestData.AirTemperature :
+                                  sortType === 'minTemperature' ? latestData.AirTemperature :
+                                  sortType === 'windSpeed' ? latestData.WindSpeed :
+                                  latestData.Precipitation;
+                    if (value != null && (sortType !== 'precipitation' || value >= 0)) {
+                        nowRanking.push({
+                            station,
+                            value,
+                            time: latestData.Time
+                        });
+                    }
+                }
             });
 
+            const sortedTodayRanking = todayRanking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5);
+            const sortedNowRanking = nowRanking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5);
+
+            for (let i = 0; i < 5; i++) {
+                const todayItem = sortedTodayRanking[i] || {};
+                const nowItem = sortedNowRanking[i] || {};
+                const todayTimeStr = todayItem.time ? `${todayItem.time.getHours().toString().padStart(2, '0')}:${todayItem.time.getMinutes().toString().padStart(2, '0')}` : '-';
+                const nowTimeStr = nowItem.time ? `${nowItem.time.getHours().toString().padStart(2, '0')}:${nowItem.time.getMinutes().toString().padStart(2, '0')}` : '-';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${todayItem.station || '-'}</td>
+                    <td>${todayItem.value != null ? todayItem.value.toFixed(1) : '-'}</td>
+                    <td>${todayTimeStr}</td>
+                    <td>${i + 1}</td>
+                    <td>${nowItem.station || '-'}</td>
+                    <td>${nowItem.value != null ? nowItem.value.toFixed(1) : '-'}</td>
+                    <td>${nowTimeStr}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+
             if (tableBody.innerHTML === '') {
-                tableBody.innerHTML = '<tr><td colspan="4">暫無排行資料</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
             }
         }
 
@@ -795,7 +854,7 @@
             });
 
             precipitationChart = new Chart(document.getElementById('precipitationChart'), {
-                type: 'bar',
+                type: chartType,
                 data: { datasets: datasets.precipitation },
                 options: {
                     responsive: true,
@@ -827,7 +886,12 @@
                     if (stationData && stationData.length > 0) {
                         const latestData = stationData.sort((a, b) => b.Time - a.Time)[0];
                         const weather = latestData.Weather || '未知';
-                        if (weather === '未知' || !weatherEmojis[weather]) {
+                        const hours = latestData.Time.getHours();
+                        let displayWeather = weather;
+                        if (weather === '晴') {
+                            displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+                        }
+                        if (displayWeather === '未知' || !weatherEmojis[displayWeather]) {
                             markerIcon = L.divIcon({
                                 className: 'custom-marker',
                                 html: `<div style="width: 12px; height: 12px; background-color: #808080; border-radius: 50%; transform: translate(-50%, -50%);"></div>`,
@@ -835,7 +899,7 @@
                                 iconAnchor: [6, 6]
                             });
                         } else {
-                            const emoji = weatherEmojis[weather];
+                            const emoji = weatherEmojis[displayWeather];
                             markerIcon = L.divIcon({
                                 className: 'custom-marker',
                                 html: `<div style="font-size: 20px; transform: translate(-50%, -50%);">${emoji}</div>`,
