@@ -3,12 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>基隆氣象站 - 山海好厝邊 天氣資訊</title>
-    <meta name="description" content="基隆氣象站提供即時基隆北海岸天氣資訊，包括雷達回波、累積雨量、衛星雲圖、海象圖資及天氣預報，簡單清晰，適合手機與電腦閱覽。">
-    <meta name="keywords" content="基隆氣象站, 基隆北海岸天氣, 雷達回波圖, 累積雨量, 海象圖資, 天氣預報, 中央氣象署">
-    <meta name="author" content="基隆氣象站 鄧乃誠">
-    <link rel="canonical" href="https://keelungcwa.github.io/">
-
+    <title>基隆氣象站 山海好厝邊 🌧️🏞️</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -24,19 +19,17 @@
     </script>
 
     <!-- Open Graph 設定 -->
-    <meta property="og:title" content="基隆氣象站 - 山海好厝邊 天氣資訊">
-    <meta property="og:description" content="即時掌握基隆北海岸天氣資訊！提供雷達回波、累積雨量、衛星雲圖、海象圖資及天氣預報，簡單清晰，隨時隨地查詢。">
-    <meta property="og:image" content="https://keelungcwa.github.io/keelungcwa/images/image2.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="1200">
+    <meta property="og:title" content="基隆氣象站 山海好厝邊 🌧️🏞️">
+    <meta property="og:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta property="og:image" content="https://keelungcwa.github.io/assets/keelung_weather_preview.jpg">
     <meta property="og:url" content="https://keelungcwa.github.io/">
     <meta property="og:type" content="website">
-
+    
     <!-- Twitter Card 設定 -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="基隆氣象站 - 山海好厝邊 天氣資訊">
-    <meta name="twitter:description" content="即時掌握基隆北海岸天氣資訊！提供雷達回波、累積雨量、衛星雲圖、海象圖資及天氣預報，簡單清晰，隨時隨地查詢。">
-    <meta name="twitter:image" content="https://keelungcwa.github.io/keelungcwa/images/image2.png">
+    <meta name="twitter:title" content="基隆氣象站 山海好厝邊 🌧️🏞️">
+    <meta name="twitter:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta name="twitter:image" content="https://keelungcwa.github.io/assets/keelung_weather_preview.jpg">
 
     <style>
         body {
@@ -476,19 +469,19 @@
         <div class="image-grid">
             <div class="image-container">
                 <h3>圖卡1</h3>
-                <img src="https://keelungcwa.github.io/keelungcwa/images/image1.png" alt="基隆氣象站圖卡1：天氣資訊概覽">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image1.png" alt="圖卡1">
             </div>
             <div class="image-container">
                 <h3>圖卡2</h3>
-                <img src="https://keelungcwa.github.io/keelungcwa/images/image2.png" alt="基隆氣象站圖卡2：北海岸天氣概況">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image2.png" alt="圖卡2">
             </div>
             <div class="image-container">
                 <h3>圖卡3</h3>
-                <img src="https://keelungcwa.github.io/keelungcwa/images/image3.png" alt="基隆氣象站圖卡3：海象資訊">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image3.png" alt="圖卡3">
             </div>
             <div class="image-container">
                 <h3>圖卡4</h3>
-                <img src="https://keelungcwa.github.io/keelungcwa/images/image4.png" alt="基隆氣象站圖卡4：天氣預報">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image4.png" alt="圖卡4">
             </div>
         </div>
     </div>
@@ -803,7 +796,7 @@
             latestPrecipitation.sort((a, b) => b.value - a.value);
             const top15Precipitation = latestPrecipitation.slice(0, 15);
             datasets.precipitation = top15Precipitation.map(item => ({
-                label: item.stationscpp
+                label: item.station,
                 data: [{ x: item.station, y: item.value }],
                 backgroundColor: item.color,
                 borderColor: item.color,
