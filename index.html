@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資">
+    <meta name="author" content="基隆氣象站 鄧乃誠">
+    <meta name="robots" content="index, follow">
     <title>基隆氣象站 山海好厝邊 🌧️🏞️</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D74WCKD2S0"></script>
@@ -106,23 +110,14 @@
             grid-template-rows: auto;
             gap: 10px;
         }
-        .chart-container {
-            width: 100%;
-            height: 250px;
+        .chart-container, .ranking-container {
+            width: 95%;
+            margin: 0 auto;
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-        }
-        .ranking-container {
-            width: 100%;
-            height: 250px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-            overflow: auto;
         }
         .ranking-container table {
             width: 100%;
@@ -138,7 +133,6 @@
         .ranking-container th:last-child, .ranking-container td:last-child {
             border-right: none;
         }
-        /* 在第 4 欄（今日的時間）後加雙直線 */
         .ranking-container th:nth-child(4), .ranking-container td:nth-child(4) {
             border-right: 2px double #333;
         }
@@ -181,6 +175,9 @@
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             background-color: rgba(255, 255, 255, 0.9);
+        }
+        #keelungCard .image-container {
+            height: 330px;
         }
         .image-container img, .image-container iframe {
             width: 100%;
@@ -243,7 +240,6 @@
         #map {
             width: 100%;
             height: 100%;
-            min-height: 250px;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -267,6 +263,14 @@
         footer a:hover {
             text-decoration: underline;
         }
+        .social-icons a {
+            margin: 0 8px;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+        .social-icons a:hover {
+            color: #2c3e50;
+        }
         @media (min-width: 769px) {
             .image-grid {
                 grid-template-columns: repeat(4, 1fr);
@@ -278,16 +282,17 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             .chart-container, .ranking-container, #map {
-                height: 250px;
+                height: 275px;
             }
         }
         @media (max-width: 768px) {
             .tabs { flex-direction: column; align-items: center; }
             .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
             .chart-grid { grid-template-columns: 1fr; }
-            .chart-container, .ranking-container, #map { height: 200px; }
+            .chart-container, .ranking-container, #map { height: 220px; }
             .image-grid { grid-template-columns: 1fr; }
             .image-container { height: 250px; }
+            #keelungCard .image-container { height: 275px; }
             .marine-grid .image-container { height: 300px; }
             .surge-container { height: 300px; }
             .forecast-container, .yunbot-container, .coastal-container { height: 400px; }
@@ -312,13 +317,13 @@
 
     <!-- 分頁選單 -->
     <div class="tabs">
-        <div class="tab active" onclick="showTab('weatherCharts')">天氣圖資 ☁️</div>
-        <div class="tab" onclick="showTab('marine')">海象圖資 🌊</div>
-        <div class="tab" onclick="showTab('charts')">基隆北海岸❤️</div>
-        <div class="tab" onclick="showTab('forecast')">天氣預報 ⛅</div>
-        <div class="tab" onclick="showTab('coastal')">鄉鎮沿海預報 🛳️</div>
-        <div class="tab" onclick="showTab('yunbot')">雲寶問天氣 🤖</div>
-        <div class="tab" onclick="showTab('keelungCard')">氣象站圖卡 🎏</div>
+        <div class="tab active" data-tab="weatherCharts">天氣圖資 ☁️</div>
+        <div class="tab" data-tab="marine">海象圖資 🌊</div>
+        <div class="tab" data-tab="charts">基隆北海岸❤️</div>
+        <div class="tab" data-tab="forecast">天氣預報 ⛅</div>
+        <div class="tab" data-tab="coastal">鄉鎮沿海預報 🛳️</div>
+        <div class="tab" data-tab="yunbot">雲寶問天氣 🤖</div>
+        <div class="tab" data-tab="keelungCard">氣象站圖卡 🎏</div>
     </div>
 
     <!-- 第 1 頁面：天氣圖資（2*4 佈局） -->
@@ -496,11 +501,39 @@
 
     <!-- 底部資訊 -->
     <footer>
-        <p>| <a href="javascript:void(0)" onclick="showTab('aboutKeelung')">關於本網站</a> |</p>
+        <p>| <a href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a> | 
+           <span class="social-icons">
+               <a href="https://www.facebook.com/keelungcwb" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+               <a href="https://maps.app.goo.gl/KTwwkkC9LxZeFJhF8" target="_blank" title="Google Maps"><i class="fas fa-map-marker-alt"></i></a>
+               <a href="https://www.instagram.com/cwa_weather/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+               <a href="https://www.youtube.com/@cwbwebtv" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+           </span> |
+        </p>
         <p>| 服務時間：09:00至17:00 地址：200基隆市仁愛區港西街6號6樓 (海港大樓)</p>
         <p>| 電話：(02)2422-4240 | 電子郵件：<a href="mailto:keelung@cwa.gov.tw">keelung@cwa.gov.tw</a></p>
         <p>| 中央氣象署基隆氣象站 版權所有 轉載請註明出處</p>
     </footer>
+
+    <!-- 結構化數據（Schema.org） -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "基隆氣象站 山海好厝邊",
+        "url": "https://keelungcwa.github.io/",
+        "description": "即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。由基隆氣象站開發、整合之簡易版網站。",
+        "publisher": {
+            "@type": "Organization",
+            "name": "中央氣象署基隆氣象站",
+            "url": "https://www.cwa.gov.tw/"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://keelungcwa.github.io/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
 
     <script>
         let tempChart, humidityChart, windSpeedChart, precipitationChart;
@@ -543,20 +576,30 @@
         };
 
         function showTab(tabId) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            const tabElement = document.querySelector(`.tab[onclick="showTab('${tabId}')"]`);
-            if (tabElement) tabElement.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-            
-            if (tabId === 'charts') {
-                setTimeout(() => {
-                    if (mapInstance) {
-                        mapInstance.invalidateSize();
-                    } else {
-                        initMap();
-                    }
-                }, 100);
+            console.log(`Switching to tab: ${tabId}`);
+            try {
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                const tabElement = document.querySelector(`.tab[data-tab="${tabId}"]`);
+                const contentElement = document.getElementById(tabId);
+                if (!tabElement || !contentElement) {
+                    console.error(`Tab or content not found for ID: ${tabId}`);
+                    return;
+                }
+                tabElement.classList.add('active');
+                contentElement.classList.add('active');
+                
+                if (tabId === 'charts') {
+                    setTimeout(() => {
+                        if (mapInstance) {
+                            mapInstance.invalidateSize();
+                        } else {
+                            initMap();
+                        }
+                    }, 100);
+                }
+            } catch (error) {
+                console.error('Error in showTab:', error);
             }
         }
 
@@ -942,12 +985,33 @@
             }
         }
 
-        window.onload = () => {
+        let isInitialized = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isInitialized) {
+                console.warn('Initialization already performed, skipping.');
+                return;
+            }
+            isInitialized = true;
+            console.log('Initializing page...');
+
+            // 綁定分頁點擊事件
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    showTab(tabId);
+                });
+            });
+
+            // 綁定「關於本網站」點擊事件
+            document.querySelector('a[data-tab="aboutKeelung"]').addEventListener('click', () => {
+                showTab('aboutKeelung');
+            });
+
             loadAndPlotData();
             if (document.getElementById('charts').classList.contains('active')) {
                 initMap();
             }
-        };
+        });
     </script>
 </body>
 </html>
