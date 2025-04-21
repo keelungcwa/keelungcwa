@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資">
+    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆北海岸, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
     <meta name="author" content="基隆氣象站 鄧乃誠">
     <meta name="robots" content="index, follow">
     <title>基隆氣象站 山海好厝邊 🌧️🏞️</title>
@@ -46,6 +46,10 @@
             display: flex;
             flex-direction: column;
         }
+        body.sunny { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        body.rainy { background: linear-gradient(135deg, #4b79a1 0%, #283e51 100%); }
+        body.cloudy { background: linear-gradient(135deg, #b0c4de 0%, #4682b4 100%); }
+        body.foggy { background: linear-gradient(135deg, #d3d3d3 0%, #a9a9a9 100%); }
         h1 {
             font-size: 1.5em;
             color: #000000;
@@ -290,6 +294,10 @@
             .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
             .chart-grid { grid-template-columns: 1fr; }
             .chart-container, .ranking-container, #map { height: 220px; }
+            .ranking-container {
+                height: 200px;
+                overflow-y: auto;
+            }
             .image-grid { grid-template-columns: 1fr; }
             .image-container { height: 250px; }
             #keelungCard .image-container { height: 275px; }
@@ -501,7 +509,7 @@
 
     <!-- 底部資訊 -->
     <footer>
-        <p>| <a href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a> | 
+        <p>| <a id="aboutLink" href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a> | 
            <span class="social-icons">
                <a href="https://www.facebook.com/keelungcwb" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
                <a href="https://maps.app.goo.gl/KTwwkkC9LxZeFJhF8" target="_blank" title="Google Maps"><i class="fas fa-map-marker-alt"></i></a>
@@ -563,17 +571,18 @@
             '金山': [25.223628, 121.643967], '三和': [25.233153, 121.595236], '瑞芳': [25.1086, 121.8111],
             '五分山': [25.071182, 121.781205]
         };
-        const weatherEmojis = {
-            '晴': '☀️', // 06:00~18:00
-            '晚晴': '🌙', // 18:00~06:00
-            '多雲': '🌥️',
-            '陰': '☁️',
-            '雨': '🌧️',
-            '雷雨': '⛈️',
-            '靄': '🌫️',
-            '霾': '🌫️',
-            '霧': '🌫️'
-        };
+
+        function getWeatherEmoji(weather, hours) {
+            if (weather === '晴') {
+                return (hours >= 18 || hours < 6) ? '🌙' : '☀️';
+            }
+            if (weather.includes('雷')) return '⛈️';
+            if (weather.includes('多雲')) return '🌥️';
+            if (weather.includes('陰')) return '☁️';
+            if (weather.includes('雨')) return '🌧️';
+            if (weather.includes('霧') || weather.includes('靄') || weather.includes('霾')) return '🌫️';
+            return '❓';
+        }
 
         function showTab(tabId) {
             console.log(`Switching to tab: ${tabId}`);
@@ -582,13 +591,12 @@
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                 const tabElement = document.querySelector(`.tab[data-tab="${tabId}"]`);
                 const contentElement = document.getElementById(tabId);
-                if (!tabElement || !contentElement) {
-                    console.error(`Tab or content not found for ID: ${tabId}`);
+                if (!contentElement) {
+                    console.error(`Content not found for ID: ${tabId}`);
                     return;
                 }
-                tabElement.classList.add('active');
+                if (tabElement) tabElement.classList.add('active');
                 contentElement.classList.add('active');
-                
                 if (tabId === 'charts') {
                     setTimeout(() => {
                         if (mapInstance) {
@@ -667,6 +675,7 @@
             const keelungData = allData['基隆'];
             if (!keelungData || keelungData.length === 0) {
                 document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
+                document.body.className = '';
                 return;
             }
 
@@ -684,14 +693,20 @@
             if (weather === '晴') {
                 displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
             }
-            const weatherEmoji = weatherEmojis[displayWeather] || '❓';
+            const weatherEmoji = getWeatherEmoji(weather, hours);
             
             const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
             const now = new Date();
             const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
 
             document.getElementById('latestWeather').innerHTML = 
-                `${dateStr} ${weather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
+                `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
+            
+            const weatherClass = weather.includes('晴') ? 'sunny' :
+                                weather.includes('雨') || weather.includes('雷') ? 'rainy' :
+                                weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
+                                weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
+            document.body.className = weatherClass;
         }
 
         function updateRankingTable(sortType = 'maxTemperature') {
@@ -915,17 +930,16 @@
             if (mapInstance) {
                 mapInstance.remove();
             }
-
             mapInstance = L.map('map').setView([25.128, 121.742], 10);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
                 attribution: '© OpenStreetMap contributors'
             }).addTo(mapInstance);
-
             for (let [name, [lat, lng]] of Object.entries(stations)) {
                 if (allStations.includes(name)) {
                     let markerIcon;
                     const stationData = allData[name];
+                    let popupContent = `<b>${name}</b><br>無數據`;
                     if (stationData && stationData.length > 0) {
                         const latestData = stationData.sort((a, b) => b.Time - a.Time)[0];
                         const weather = latestData.Weather || '未知';
@@ -934,22 +948,24 @@
                         if (weather === '晴') {
                             displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
                         }
-                        if (displayWeather === '未知' || !weatherEmojis[displayWeather]) {
-                            markerIcon = L.divIcon({
-                                className: 'custom-marker',
-                                html: `<div style="width: 12px; height: 12px; background-color: #808080; border-radius: 50%; transform: translate(-50%, -50%);"></div>`,
-                                iconSize: [12, 12],
-                                iconAnchor: [6, 6]
-                            });
-                        } else {
-                            const emoji = weatherEmojis[displayWeather];
-                            markerIcon = L.divIcon({
-                                className: 'custom-marker',
-                                html: `<div style="font-size: 20px; transform: translate(-50%, -50%);">${emoji}</div>`,
-                                iconSize: [30, 30],
-                                iconAnchor: [15, 15]
-                            });
-                        }
+                        const emoji = getWeatherEmoji(weather, hours);
+                        const timeStr = `${latestData.Time.getHours().toString().padStart(2, '0')}:${latestData.Time.getMinutes().toString().padStart(2, '0')}`;
+                        popupContent = `
+                            <b>${name}</b><br>
+                            天氣: ${displayWeather} ${emoji}<br>
+                            氣溫: ${latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A'} °C<br>
+                            濕度: ${latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A'} %<br>
+                            風速: ${latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A'} m/s<br>
+                            雨量: ${latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A'} mm<br>
+                            更新時間: ${timeStr}
+                        `;
+                        const isVisible = visibleStations.includes(name);
+                        markerIcon = L.divIcon({
+                            className: 'custom-marker',
+                            html: `<div style="font-size: ${isVisible ? '30px' : '20px'}; transform: translate(-50%, -50%);">${emoji}</div>`,
+                            iconSize: [isVisible ? 45 : 30, isVisible ? 45 : 30],
+                            iconAnchor: [isVisible ? 22.5 : 15, isVisible ? 22.5 : 15]
+                        });
                     } else {
                         markerIcon = L.divIcon({
                             className: 'custom-marker',
@@ -958,12 +974,12 @@
                             iconAnchor: [6, 6]
                         });
                     }
-
-                    const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(mapInstance).bindPopup(name);
-                    marker.on('click', () => toggleStation(name));
+                    L.marker([lat, lng], { icon: markerIcon })
+                        .addTo(mapInstance)
+                        .bindPopup(popupContent)
+                        .on('click', () => toggleStation(name));
                 }
             }
-
             setTimeout(() => {
                 mapInstance.invalidateSize();
             }, 100);
@@ -973,8 +989,10 @@
             try {
                 if (visibleStations.includes(station)) {
                     visibleStations = visibleStations.filter(s => s !== station);
+                    alert(`已移除測站：${station}`);
                 } else {
                     visibleStations.push(station);
+                    alert(`已添加測站：${station}`);
                 }
                 const now = new Date();
                 const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
@@ -982,6 +1000,7 @@
                 initMap();
             } catch (error) {
                 console.error('切換站點失敗:', error);
+                alert('切換測站失敗，請稍後重試');
             }
         }
 
@@ -1003,9 +1022,15 @@
             });
 
             // 綁定「關於本網站」點擊事件
-            document.querySelector('a[data-tab="aboutKeelung"]').addEventListener('click', () => {
-                showTab('aboutKeelung');
-            });
+            const aboutLink = document.getElementById('aboutLink');
+            if (aboutLink) {
+                aboutLink.addEventListener('click', () => {
+                    console.log('About link clicked');
+                    showTab('aboutKeelung');
+                });
+            } else {
+                console.error('About link not found');
+            }
 
             loadAndPlotData();
             if (document.getElementById('charts').classList.contains('active')) {
