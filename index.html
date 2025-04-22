@@ -40,16 +40,41 @@
             font-family: 'Noto Sans TC', Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%);
+            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%); /* 預設背景（陰天/多雲） */
             color: #333;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            position: relative; /* 為雨滴畫布定位 */
         }
-        body.sunny { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
-        body.rainy { background: linear-gradient(135deg, #4b79a1 0%, #283e51 100%); }
-        body.cloudy { background: linear-gradient(135deg, #b0c4de 0%, #4682b4 100%); }
-        body.foggy { background: linear-gradient(135deg, #d3d3d3 0%, #a9a9a9 100%); }
+        body.sunny {
+            background: linear-gradient(135deg, #fffacd 0%, #ffffff 100%); /* 晴天白天：淺黃色到白色 */
+        }
+        body.night {
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); /* 晴天夜晚：深黑藍到藍灰 */
+            color: #fff; /* 夜晚文字為白色 */
+        }
+        body.night h1, body.night h3, body.night .weather-info, body.night .tab, body.night .ranking-container th, body.night .ranking-container td, body.night footer, body.night footer a {
+            color: #fff; /* 確保標題、表格、頁尾等文字為白色 */
+        }
+        body.cloudy {
+            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%); /* 陰天/多雲：預設淺藍色 */
+        }
+        body.rainy {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); /* 雨天/雷雨：深藍色 */
+        }
+        body.foggy {
+            background: linear-gradient(135deg, #f5f6f5 0%, #e0e6e8 100%); /* 霧天：霧白色 */
+        }
+        #rainCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* 確保雨滴在背景層 */
+            pointer-events: none; /* 避免畫布干擾交互 */
+        }
         h1 {
             font-size: 1.5em;
             color: #000000;
@@ -71,6 +96,8 @@
             text-align: center;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             font-size: 0.9em;
+            position: relative;
+            z-index: 1; /* 確保內容在雨滴之上 */
         }
         .tabs {
             display: flex;
@@ -81,6 +108,8 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            position: relative;
+            z-index: 1;
         }
         .tab {
             padding: 10px 20px;
@@ -104,6 +133,8 @@
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
         .tab-content.active {
             display: block;
@@ -122,6 +153,8 @@
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            position: relative;
+            z-index: 1;
         }
         .ranking-container table {
             width: 100%;
@@ -179,6 +212,8 @@
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             background-color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
         }
         #keelungCard .image-container {
             height: 330px;
@@ -235,6 +270,8 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
         .forecast-container iframe, .coastal-container iframe, .yunbot-container iframe {
             width: 100%;
@@ -246,6 +283,8 @@
             height: 100%;
             border-radius: 8px;
             overflow: hidden;
+            position: relative;
+            z-index: 1;
         }
         footer {
             margin-top: auto;
@@ -256,6 +295,8 @@
             background-color: rgba(255, 255, 255, 0.9);
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
         footer p {
             margin: 5px 0;
@@ -318,6 +359,7 @@
     </style>
 </head>
 <body>
+    <canvas id="rainCanvas"></canvas> <!-- 雨滴特效畫布 -->
     <h1>基隆氣象站 山海好厝邊 🌧️🏞️</h1>
 
     <!-- 最新天氣觀測 -->
@@ -458,7 +500,7 @@
 
     <!-- 第 4 頁面：天氣預報 -->
     <div id="forecast" class="tab-content">
-        <div class="forecast-container">
+        <"<div class="forecast-container">
             <iframe src="https://www.cwa.gov.tw/V8/C/W/County/County.html?CID=10017" frameborder="0"></iframe>
         </div>
     </div>
@@ -572,6 +614,10 @@
             '五分山': [25.071182, 121.781205]
         };
 
+        // 雨滴特效相關變數
+        let rainAnimationFrame = null;
+        const rainDrops = [];
+
         function getWeatherEmoji(weather, hours) {
             if (weather === '晴') {
                 return (hours >= 18 || hours < 6) ? '🌙' : '☀️';
@@ -676,6 +722,7 @@
             if (!keelungData || keelungData.length === 0) {
                 document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
                 document.body.className = '';
+                stopRainEffect();
                 return;
             }
 
@@ -690,8 +737,14 @@
             const timeStr = `${hours.toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
             
             let displayWeather = weather;
+            let weatherClass = '';
             if (weather === '晴') {
                 displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+                weatherClass = (hours >= 18 || hours < 6) ? 'night' : 'sunny';
+            } else {
+                weatherClass = weather.includes('雨') || weather.includes('雷') ? 'rainy' :
+                              weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
+                              weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
             }
             const weatherEmoji = getWeatherEmoji(weather, hours);
             
@@ -702,11 +755,86 @@
             document.getElementById('latestWeather').innerHTML = 
                 `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
             
-            const weatherClass = weather.includes('晴') ? 'sunny' :
-                                weather.includes('雨') || weather.includes('雷') ? 'rainy' :
-                                weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
-                                weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
             document.body.className = weatherClass;
+
+            // 根據天氣啟動或停止雨滴特效
+            if (weatherClass === 'rainy') {
+                startRainEffect();
+            } else {
+                stopRainEffect();
+            }
+        }
+
+        // 雨滴特效函數
+        function startRainEffect() {
+            const canvas = document.getElementById('rainCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            // 雨滴物件
+            function RainDrop() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -canvas.height;
+                this.length = Math.random() * 20 + 10;
+                this.speed = Math.random() * 5 + 5;
+            }
+
+            RainDrop.prototype.update = function() {
+                this.y += this.speed;
+                if (this.y > canvas.height) {
+                    this.y = -this.length;
+                    this.x = Math.random() * canvas.width;
+                }
+            };
+
+            RainDrop.prototype.draw = function(ctx) {
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x, this.y + this.length);
+                ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            };
+
+            // 初始化雨滴
+            if (rainDrops.length === 0) {
+                for (let i = 0; i < 100; i++) {
+                    rainDrops.push(new RainDrop());
+                }
+            }
+
+            // 動畫迴圈
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                rainDrops.forEach(drop => {
+                    drop.update();
+                    drop.draw(ctx);
+                });
+                rainAnimationFrame = requestAnimationFrame(animate);
+            }
+
+            // 處理視窗大小變化
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+
+            // 開始動畫
+            if (!rainAnimationFrame) {
+                animate();
+            }
+        }
+
+        function stopRainEffect() {
+            const canvas = document.getElementById('rainCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (rainAnimationFrame) {
+                cancelAnimationFrame(rainAnimationFrame);
+                rainAnimationFrame = null;
+            }
+            rainDrops.length = 0; // 清空雨滴
         }
 
         function updateRankingTable(sortType = 'maxTemperature') {
