@@ -6,12 +6,14 @@
     <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆北海岸, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
     <meta name="author" content="基隆氣象站 鄧乃誠">
     <meta name="robots" content="index, follow">
-    <title>基隆氣象站 山海好厝邊 🌧️🏞️</title>
+    <title>基隆氣象站 山海好厝邊</title>
+    <link rel="icon" type="image/png" href="https://keelungcwa.github.io/keelungcwa/images/favicon.png">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D74WCKD2S0"></script>
@@ -23,48 +25,55 @@
     </script>
 
     <!-- Open Graph 設定 -->
-    <meta property="og:title" content="基隆氣象站 山海好厝邊 🌧️🏞️">
+    <meta property="og:title" content="基隆氣象站 山海好厝邊">
     <meta property="og:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
-    <meta property="og:image" content="https://keelungcwa.github.io/assets/keelung_weather_preview.jpg">
+    <meta property="og:image" content="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png">
     <meta property="og:url" content="https://keelungcwa.github.io/">
     <meta property="og:type" content="website">
     
     <!-- Twitter Card 設定 -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="基隆氣象站 山海好厝邊 🌧️🏞️">
+    <meta name="twitter:title" content="基隆氣象站 山海好厝邊">
     <meta name="twitter:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
-    <meta name="twitter:image" content="https://keelungcwa.github.io/assets/keelung_weather_preview.jpg">
+    <meta name="twitter:image" content="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png">
 
     <style>
         body {
             font-family: 'Noto Sans TC', Arial, sans-serif;
             margin: 0;
             padding: 10px;
-            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%); /* 預設背景（陰天/多雲） */
+            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%);
             color: #333;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative; /* 為雨滴畫布定位 */
+            position: relative;
+            overflow-x: hidden;
         }
         body.sunny {
-            background: linear-gradient(135deg, #fffacd 0%, #ffffff 100%); /* 晴天白天：淺黃色到白色 */
+            background: linear-gradient(135deg, #fffacd 0%, #ffffff 100%);
         }
         body.night {
-            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%); /* 晴天夜晚：深黑藍到藍灰 */
-            color: #fff; /* 夜晚文字為白色 */
-        }
-        body.night h1, body.night h3, body.night .weather-info, body.night .tab, body.night .ranking-container th, body.night .ranking-container td, body.night footer, body.night footer a {
-            color: #fff; /* 確保標題、表格、頁尾等文字為白色 */
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
         }
         body.cloudy {
-            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%); /* 陰天/多雲：預設淺藍色 */
+            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%);
         }
-        body.rainy {
-            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%); /* 雨天/雷雨：深藍色 */
+        body.rainy, body.thunder {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
         }
-        body.foggy {
-            background: linear-gradient(135deg, #f5f6f5 0%, #e0e6e8 100%); /* 霧天：霧白色 */
+        body.foggy, body.haze, body.mist {
+            background: linear-gradient(135deg, #f5f6f5 0%, #e0e6e8 100%);
+        }
+        body.thunder h1, body.rainy h1, body.night h1 {
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .title-logo {
+            width: 32px;
+            height: 32px;
+            vertical-align: middle;
+            margin-right: 8px;
         }
         #rainCanvas {
             position: absolute;
@@ -72,9 +81,41 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0; /* 確保雨滴在背景層 */
-            pointer-events: none; /* 避免畫布干擾交互 */
+            z-index: 0;
+            pointer-events: none;
+            display: none;
         }
+        body.rainy #rainCanvas, body.thunder #rainCanvas {
+            display: block;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: none;
+        }
+        body.night .stars {
+            display: block;
+        }
+        .star {
+            position: absolute;
+            color: #ffff00;
+            font-size: 16px;
+            animation: twinkle linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .star:nth-child(1) { top: 10%; left: 20%; animation-duration: 2.5s; }
+        .star:nth-child(2) { top: 30%; left: 60%; animation-duration: 3s; }
+        .star:nth-child(3) { top: 50%; left: 40%; animation-duration: 2.2s; }
+        .star:nth-child(4) { top: 70%; left: 80%; animation-duration: 3.5s; }
+        .star:nth-child(5) { top: 20%; left: 50%; animation-duration: 2.8s; }
         h1 {
             font-size: 1.5em;
             color: #000000;
@@ -97,7 +138,7 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             font-size: 0.9em;
             position: relative;
-            z-index: 1; /* 確保內容在雨滴之上 */
+            z-index: 1;
         }
         .tabs {
             display: flex;
@@ -153,8 +194,6 @@
             padding: 10px;
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            position: relative;
-            z-index: 1;
         }
         .ranking-container table {
             width: 100%;
@@ -212,8 +251,6 @@
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             background-color: rgba(255, 255, 255, 0.9);
-            position: relative;
-            z-index: 1;
         }
         #keelungCard .image-container {
             height: 330px;
@@ -270,8 +307,6 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
-            z-index: 1;
         }
         .forecast-container iframe, .coastal-container iframe, .yunbot-container iframe {
             width: 100%;
@@ -346,6 +381,7 @@
             .surge-container { height: 300px; }
             .forecast-container, .yunbot-container, .coastal-container { height: 400px; }
             h1 { font-size: 1.3em; }
+            .title-logo { width: 28px; height: 28px; }
             h3 { font-size: 1em; }
             p { font-size: 0.9em; }
             footer { font-size: 0.7em; }
@@ -359,8 +395,15 @@
     </style>
 </head>
 <body>
-    <canvas id="rainCanvas"></canvas> <!-- 雨滴特效畫布 -->
-    <h1>基隆氣象站 山海好厝邊 🌧️🏞️</h1>
+    <canvas id="rainCanvas"></canvas>
+    <div class="stars">
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+        <span class="star">★</span>
+    </div>
+    <h1><img src="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png" alt="基隆氣象站 Logo" class="title-logo">基隆氣象站 山海好厝邊</h1>
 
     <!-- 最新天氣觀測 -->
     <div class="weather-info" id="latestWeather">載入基隆最新天氣資料中...</div>
@@ -369,7 +412,7 @@
     <div class="tabs">
         <div class="tab active" data-tab="weatherCharts">天氣圖資 ☁️</div>
         <div class="tab" data-tab="marine">海象圖資 🌊</div>
-        <div class="tab" data-tab="charts">基隆北海岸❤️</div>
+        <div class="tab" data-tab="charts">基隆北海岸🏞️</div>
         <div class="tab" data-tab="forecast">天氣預報 ⛅</div>
         <div class="tab" data-tab="coastal">鄉鎮沿海預報 🛳️</div>
         <div class="tab" data-tab="yunbot">雲寶問天氣 🤖</div>
@@ -500,7 +543,7 @@
 
     <!-- 第 4 頁面：天氣預報 -->
     <div id="forecast" class="tab-content">
-        <"<div class="forecast-container">
+        <div class="forecast-container">
             <iframe src="https://www.cwa.gov.tw/V8/C/W/County/County.html?CID=10017" frameborder="0"></iframe>
         </div>
     </div>
@@ -586,6 +629,178 @@
     </script>
 
     <script>
+        const canvas = document.getElementById('rainCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const rainDrops = [];
+        const lightnings = [];
+        let animationFrame = null;
+
+        function RainDrop() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * -canvas.height;
+            this.length = Math.random() * 15 + 8;
+            this.speed = Math.random() * 4 + 4;
+        }
+
+        RainDrop.prototype.update = function() {
+            this.y += this.speed;
+            if (this.y > canvas.height) {
+                this.y = -this.length;
+                this.x = Math.random() * canvas.width;
+            }
+        };
+
+        RainDrop.prototype.draw = function(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x, this.y + this.length);
+            ctx.strokeStyle = 'rgba(174, 194, 224, 0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        };
+
+        function Lightning() {
+            this.mainPath = [];
+            this.branches = [];
+            this.opacity = 0;
+            this.lifetime = 0;
+            this.generate();
+        }
+
+        Lightning.prototype.generate = function() {
+            this.mainPath = [];
+            const startX = Math.random() * canvas.width * 0.4 + canvas.width * 0.3;
+            const startY = 0;
+            let currentX = startX;
+            let currentY = 0;
+            this.mainPath.push({ x: currentX, y: currentY });
+            const segments = 8;
+            for (let i = 0; i < segments; i++) {
+                currentX += (Math.random() - 0.5) * 50;
+                currentY += canvas.height / segments;
+                this.mainPath.push({ x: currentX, y: currentY });
+            }
+
+            this.branches = [];
+            const branchCount = Math.floor(Math.random() * 3) + 1;
+            for (let i = 0; i < branchCount; i++) {
+                const segmentIndex = Math.floor(Math.random() * 3) + 2;
+                const startPoint = this.mainPath[segmentIndex];
+                const branch = [];
+                let bx = startPoint.x;
+                let by = startPoint.y;
+                branch.push({ x: bx, y: by });
+                const branchLength = Math.random() * 0.2 * canvas.height + 0.2 * canvas.height;
+                const angle = (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 6 + Math.random() * Math.PI / 6);
+                for (let j = 0; j < 3; j++) {
+                    bx += Math.cos(angle) * (branchLength / 3);
+                    by += Math.sin(angle) * (branchLength / 3);
+                    branch.push({ x: bx, y: by });
+                }
+                this.branches.push(branch);
+            }
+
+            this.opacity = 0.9;
+            this.lifetime = 0.1;
+        };
+
+        Lightning.prototype.update = function(dt) {
+            if (this.lifetime > 0) {
+                this.lifetime -= dt;
+                this.opacity = this.lifetime > 0 ? 0.9 : 0;
+            }
+        };
+
+        Lightning.prototype.draw = function(ctx) {
+            if (this.opacity <= 0) return;
+
+            ctx.beginPath();
+            ctx.moveTo(this.mainPath[0].x, this.mainPath[0].y);
+            for (let i = 1; i < this.mainPath.length; i++) {
+                ctx.lineTo(this.mainPath[i].x, this.mainPath[i].y);
+            }
+            ctx.strokeStyle = `rgba(255, 255, 0, ${this.opacity})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            this.branches.forEach(branch => {
+                ctx.beginPath();
+                ctx.moveTo(branch[0].x, branch[0].y);
+                for (let i = 1; i < branch.length; i++) {
+                    ctx.lineTo(branch[i].x, branch[i].y);
+                }
+                ctx.strokeStyle = `rgba(255, 255, 0, ${this.opacity})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            });
+        };
+
+        function startAnimation(isThunder) {
+            if (rainDrops.length === 0 && (isThunder || document.body.classList.contains('rainy'))) {
+                for (let i = 0; i < 80; i++) {
+                    rainDrops.push(new RainDrop());
+                }
+            }
+
+            let lastTime = performance.now();
+            let lightningTimer = 0;
+            const lightningInterval = Math.random() * 3000 + 2000;
+
+            function animate() {
+                const currentTime = performance.now();
+                const dt = (currentTime - lastTime) / 1000;
+                lastTime = currentTime;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (document.body.classList.contains('rainy') || document.body.classList.contains('thunder')) {
+                    rainDrops.forEach(drop => {
+                        drop.update();
+                        drop.draw(ctx);
+                    });
+                }
+
+                if (isThunder && document.body.classList.contains('thunder')) {
+                    lightningTimer += dt * 1000;
+                    if (lightningTimer > lightningInterval) {
+                        lightnings.push(new Lightning());
+                        lightningTimer = 0;
+                    }
+                    lightnings.forEach((lightning, index) => {
+                        lightning.update(dt);
+                        lightning.draw(ctx);
+                        if (lightning.lifetime <= 0) {
+                            lightnings.splice(index, 1);
+                        }
+                    });
+                }
+
+                animationFrame = requestAnimationFrame(animate);
+            }
+
+            if (!animationFrame) {
+                animate();
+            }
+        }
+
+        function stopAnimation() {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            rainDrops.length = 0;
+            lightnings.length = 0;
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
         let tempChart, humidityChart, windSpeedChart, precipitationChart;
         let mapInstance = null;
         let allData = {};
@@ -614,10 +829,6 @@
             '五分山': [25.071182, 121.781205]
         };
 
-        // 雨滴特效相關變數
-        let rainAnimationFrame = null;
-        const rainDrops = [];
-
         function getWeatherEmoji(weather, hours) {
             if (weather === '晴') {
                 return (hours >= 18 || hours < 6) ? '🌙' : '☀️';
@@ -628,6 +839,54 @@
             if (weather.includes('雨')) return '🌧️';
             if (weather.includes('霧') || weather.includes('靄') || weather.includes('霾')) return '🌫️';
             return '❓';
+        }
+
+        function updateLatestWeather() {
+            const keelungData = allData['基隆'];
+            if (!keelungData || keelungData.length === 0) {
+                document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
+                document.body.className = '';
+                stopAnimation();
+                return;
+            }
+
+            const latestData = keelungData.sort((a, b) => b.Time - a.Time)[0];
+            const date = latestData.Time;
+            const hours = date.getHours();
+            const weather = latestData.Weather || '未知';
+            const temperature = latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A';
+            const humidity = latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A';
+            const precipitation = latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A';
+            const windSpeed = latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A';
+            const timeStr = `${hours.toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            
+            let displayWeather = weather;
+            if (weather === '晴') {
+                displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+            }
+            const weatherEmoji = getWeatherEmoji(weather, hours);
+            
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
+
+            document.getElementById('latestWeather').innerHTML = 
+                `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
+            
+            const weatherClass = weather.includes('雷') ? 'thunder' :
+                                weather.includes('雨') ? 'rainy' :
+                                weather === '晴' && (hours >= 18 || hours < 6) ? 'night' :
+                                weather === '晴' ? 'sunny' :
+                                weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
+                                weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
+            document.body.className = weatherClass;
+
+            stopAnimation();
+            if (weatherClass === 'thunder') {
+                startAnimation(true);
+            } else if (weatherClass === 'rainy') {
+                startAnimation(false);
+            }
         }
 
         function showTab(tabId) {
@@ -711,130 +970,11 @@
                     document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
                     document.getElementById('rankingTable').querySelector('tbody').innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
                     document.getElementById('map').innerHTML = '<p style="text-align: center; color: #666;">暫無地圖資料</p>';
+                    stopAnimation();
                 });
 
             updateWaveGif();
             setInterval(updateWaveGif, 6 * 60 * 60 * 1000);
-        }
-
-        function updateLatestWeather() {
-            const keelungData = allData['基隆'];
-            if (!keelungData || keelungData.length === 0) {
-                document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
-                document.body.className = '';
-                stopRainEffect();
-                return;
-            }
-
-            const latestData = keelungData.sort((a, b) => b.Time - a.Time)[0];
-            const date = latestData.Time;
-            const hours = date.getHours();
-            const weather = latestData.Weather || '未知';
-            const temperature = latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A';
-            const humidity = latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A';
-            const precipitation = latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A';
-            const windSpeed = latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A';
-            const timeStr = `${hours.toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-            
-            let displayWeather = weather;
-            let weatherClass = '';
-            if (weather === '晴') {
-                displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
-                weatherClass = (hours >= 18 || hours < 6) ? 'night' : 'sunny';
-            } else {
-                weatherClass = weather.includes('雨') || weather.includes('雷') ? 'rainy' :
-                              weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
-                              weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
-            }
-            const weatherEmoji = getWeatherEmoji(weather, hours);
-            
-            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-            const now = new Date();
-            const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
-
-            document.getElementById('latestWeather').innerHTML = 
-                `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
-            
-            document.body.className = weatherClass;
-
-            // 根據天氣啟動或停止雨滴特效
-            if (weatherClass === 'rainy') {
-                startRainEffect();
-            } else {
-                stopRainEffect();
-            }
-        }
-
-        // 雨滴特效函數
-        function startRainEffect() {
-            const canvas = document.getElementById('rainCanvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-
-            // 雨滴物件
-            function RainDrop() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * -canvas.height;
-                this.length = Math.random() * 20 + 10;
-                this.speed = Math.random() * 5 + 5;
-            }
-
-            RainDrop.prototype.update = function() {
-                this.y += this.speed;
-                if (this.y > canvas.height) {
-                    this.y = -this.length;
-                    this.x = Math.random() * canvas.width;
-                }
-            };
-
-            RainDrop.prototype.draw = function(ctx) {
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(this.x, this.y + this.length);
-                ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            };
-
-            // 初始化雨滴
-            if (rainDrops.length === 0) {
-                for (let i = 0; i < 100; i++) {
-                    rainDrops.push(new RainDrop());
-                }
-            }
-
-            // 動畫迴圈
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                rainDrops.forEach(drop => {
-                    drop.update();
-                    drop.draw(ctx);
-                });
-                rainAnimationFrame = requestAnimationFrame(animate);
-            }
-
-            // 處理視窗大小變化
-            window.addEventListener('resize', () => {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            });
-
-            // 開始動畫
-            if (!rainAnimationFrame) {
-                animate();
-            }
-        }
-
-        function stopRainEffect() {
-            const canvas = document.getElementById('rainCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            if (rainAnimationFrame) {
-                cancelAnimationFrame(rainAnimationFrame);
-                rainAnimationFrame = null;
-            }
-            rainDrops.length = 0; // 清空雨滴
         }
 
         function updateRankingTable(sortType = 'maxTemperature') {
