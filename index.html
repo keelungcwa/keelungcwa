@@ -834,10 +834,10 @@
                 return (hours >= 18 || hours < 6) ? '🌙' : '☀️';
             }
             if (weather.includes('雷')) return '⛈️';
-            if (weather.includes('多雲')) return '🌥️';
-            if (weather.includes('陰')) return '☁️';
             if (weather.includes('雨')) return '🌧️';
             if (weather.includes('霧') || weather.includes('靄') || weather.includes('霾')) return '🌫️';
+            if (weather.includes('多雲')) return '🌥️';
+            if (weather.includes('陰')) return '☁️';
             return '❓';
         }
 
