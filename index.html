@@ -892,7 +892,7 @@
                 document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
                 document.body.className = 'cloudy';
                 stopAnimation();
-                showToast('暫無基隆天氣資料，請稍後重試');
+                showToast('暫無基隆天氣資料，請slightly後重試');
                 return;
             }
 
@@ -912,11 +912,11 @@
             }
             const weatherEmoji = getWeatherEmoji(weather, hours);
             
-            const weekdays
-
- = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
             const now = new Date();
-            const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
+            const dateStr = `${now.getFullYear()}年${(
+
+now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
 
             document.getElementById('latestWeather').innerHTML = 
                 `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
@@ -1209,8 +1209,9 @@
                         },
                         y: { 
                             title: { display: true, text: '溫度 (°C) 🌡️', font: { size: window.innerWidth > 768 ? 14 : 12 } }, 
-                            min: 0, 
-                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } } 
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } },
+                            suggestedMin: Math.min(...datasets.temperature.flatMap(d => d.data.map(p => p.y).filter(v => v != null))) - 2,
+                            suggestedMax: Math.max(...datasets.temperature.flatMap(d => d.data.map(p => p.y).filter(v => v != null))) + 2
                         }
                     }
                 }
@@ -1232,7 +1233,7 @@
                         },
                         y: { 
                             title: { display: true, text: '相對濕度 (%) 💧', font: { size: window.innerWidth > 768 ? 14 : 12 } }, 
-                            min: 0, 
+                            min: 20, 
                             max: 100, 
                             ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } } 
                         }
@@ -1294,6 +1295,9 @@
                 maxZoom: 18,
                 attribution: '© OpenStreetMap contributors'
             }).addTo(mapInstance);
+
+            const bounds = mapInstance.getBounds();
+            const zoomLevel = mapInstance.getZoom();
             for (let [name, [lat, lng]] of Object.entries(stations)) {
                 if (allStations.includes(name)) {
                     let markerIcon;
@@ -1319,11 +1323,14 @@
                             更新時間: ${timeStr}
                         `;
                         const isVisible = visibleStations.includes(name);
+                        const markerSize = isVisible ? 45 : 30;
+                        const fontSize = isVisible ? 30 : 20;
+                        const anchorY = isVisible ? 45 : 30;
                         markerIcon = L.divIcon({
                             className: 'custom-marker',
-                            html: `<div style="font-size: ${isVisible ? '30px' : '20px'}; transform: translate(-50%, -100%);">${emoji}</div>`,
-                            iconSize: [isVisible ? 45 : 30, isVisible ? 45 : 30],
-                            iconAnchor: [isVisible ? 22.5 : 15, isVisible ? 45 : 30]
+                            html: `<div style="font-size: ${fontSize}px; transform: translate(-50%, -${anchorY}px); background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;">${emoji}</div>`,
+                            iconSize: [markerSize, markerSize],
+                            iconAnchor: [markerSize / 2, anchorY]
                         });
                     } else {
                         markerIcon = L.divIcon({
