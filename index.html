@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆北海岸, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
+    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海
+岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆北海岸, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
     <meta name="author" content="基隆氣象站 鄧乃誠">
     <meta name="robots" content="index, follow">
     <title>基隆氣象站 山海好厝邊</title>
@@ -96,7 +97,7 @@
             width: 100%;
             height: 100px;
             z-index: 0;
-            pointer-events: none;
+  pointer-events: none;
             display: none;
         }
         body.night .stars {
@@ -892,7 +893,7 @@
                 document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
                 document.body.className = 'cloudy';
                 stopAnimation();
-                showToast('暫無基隆天氣資料，請slightly後重試');
+                showToast('暫無基隆天氣資料，請稍後重試');
                 return;
             }
 
@@ -914,9 +915,7 @@
             
             const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
             const now = new Date();
-            const dateStr = `${now.getFullYear()}年${(
-
-now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
+            const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
 
             document.getElementById('latestWeather').innerHTML = 
                 `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
@@ -1296,8 +1295,6 @@ now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().pa
                 attribution: '© OpenStreetMap contributors'
             }).addTo(mapInstance);
 
-            const bounds = mapInstance.getBounds();
-            const zoomLevel = mapInstance.getZoom();
             for (let [name, [lat, lng]] of Object.entries(stations)) {
                 if (allStations.includes(name)) {
                     let markerIcon;
@@ -1323,14 +1320,11 @@ now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().pa
                             更新時間: ${timeStr}
                         `;
                         const isVisible = visibleStations.includes(name);
-                        const markerSize = isVisible ? 45 : 30;
-                        const fontSize = isVisible ? 30 : 20;
-                        const anchorY = isVisible ? 45 : 30;
                         markerIcon = L.divIcon({
                             className: 'custom-marker',
-                            html: `<div style="font-size: ${fontSize}px; transform: translate(-50%, -${anchorY}px); background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;">${emoji}</div>`,
-                            iconSize: [markerSize, markerSize],
-                            iconAnchor: [markerSize / 2, anchorY]
+                            html: `<div style="font-size: 20px; transform: translate(-50%, -30px);${isVisible ? ' background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;' : ''}">${emoji}</div>`,
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30]
                         });
                     } else {
                         markerIcon = L.divIcon({
