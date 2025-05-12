@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海
-岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆北海岸, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
+    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆北海岸, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
     <meta name="author" content="基隆氣象站 鄧乃誠">
     <meta name="robots" content="index, follow">
     <title>基隆氣象站 山海好厝邊</title>
@@ -95,9 +94,9 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100px;
+            height: 100%;
             z-index: 0;
-  pointer-events: none;
+            pointer-events: none;
             display: none;
         }
         body.night .stars {
@@ -113,16 +112,6 @@
             0%, 100% { opacity: 0.4; }
             50% { opacity: 1; }
         }
-        .star:nth-child(1) { top: 10%; left: 10%; animation-duration: 2.5s; }
-        .star:nth-child(2) { top: 20%; left: 20%; animation-duration: 3s; }
-        .star:nth-child(3) { top: 15%; left: 30%; animation-duration: 2.2s; }
-        .star:nth-child(4) { top: 25%; left: 40%; animation-duration: 3.5s; }
-        .star:nth-child(5) { top: 10%; left: 50%; animation-duration: 2.8s; }
-        .star:nth-child(6) { top: 20%; left: 60%; animation-duration: 2.6s; }
-        .star:nth-child(7) { top: 15%; left: 70%; animation-duration: 3.2s; }
-        .star:nth-child(8) { top: 25%; left: 80%; animation-duration: 2.9s; }
-        .star:nth-child(9) { top: 10%; left: 90%; animation-duration: 3.1s; }
-        .star:nth-child(10) { top: 20%; left: 95%; animation-duration: 2.7s; }
         h1 {
             font-size: 1.5em;
             color: #000000;
@@ -423,18 +412,7 @@
 </head>
 <body>
     <canvas id="rainCanvas"></canvas>
-    <div class="stars">
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-        <span class="star">★</span>
-    </div>
+    <div class="stars"></div>
     <h1><img src="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png" alt="基隆氣象站 Logo" class="title-logo">基隆氣象站 山海好厝邊</h1>
 
     <!-- 最新天氣觀測 -->
@@ -619,7 +597,7 @@
     <!-- 關於本網站 -->
     <div id="aboutKeelung" class="tab-content">
         <h3>關於本網站</h3>
-        <p>本網站專注於<strong>基隆北海岸的海氣象資訊</strong>，致力於提供<strong>簡易清晰、便民實用</strong>的內容，供機關與民眾參考。精選來自各單位的重要氣象產品，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸<strong>最值得信賴的山海氣象好厝邊</strong>。</p>
+        <p>本網站專注於<strong>基隆北海岸的海氣象資訊</strong>，致力於提供<strong>簡易清晰、便民實用</strong>的內容，供機關與民眾參考。精選來自各單位的重要氣象產品，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸最值得信賴的山海氣象好厝邊。</p>
         <p>請注意，<strong>部分產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並<strong>以本署官方預報為準</strong>，以確保資訊的準確性與可靠性。</p>
         <p><strong>作者：基隆氣象站 鄧乃誠</strong></p>
     </div>
@@ -661,6 +639,21 @@
     </script>
 
     <script>
+        // 動態生成星星
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 1.5 + 1.5}s`;
+                star.innerHTML = '★';
+                starsContainer.appendChild(star);
+            }
+        }
+
         const canvas = document.getElementById('rainCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -1192,6 +1185,13 @@
                 }
             };
 
+            // 計算溫度數據範圍
+            const tempValues = datasets.temperature.flatMap(d => d.data.map(p => p.y).filter(v => v != null));
+            const tempMin = tempValues.length > 0 ? Math.min(...tempValues) : 20;
+            const tempMax = tempValues.length > 0 ? Math.max(...tempValues) : 25;
+            const yAxisMin = Math.min(20, tempMin - 2);
+            const yAxisMax = Math.max(25, tempMax + 2);
+
             tempChart = new Chart(document.getElementById('temperatureChart'), {
                 type: chartType,
                 data: { datasets: datasets.temperature },
@@ -1209,8 +1209,8 @@
                         y: { 
                             title: { display: true, text: '溫度 (°C) 🌡️', font: { size: window.innerWidth > 768 ? 14 : 12 } }, 
                             ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } },
-                            suggestedMin: Math.min(...datasets.temperature.flatMap(d => d.data.map(p => p.y).filter(v => v != null))) - 2,
-                            suggestedMax: Math.max(...datasets.temperature.flatMap(d => d.data.map(p => p.y).filter(v => v != null))) + 2
+                            min: yAxisMin,
+                            max: yAxisMax
                         }
                     }
                 }
@@ -1295,6 +1295,8 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(mapInstance);
 
+            const bounds = mapInstance.getBounds();
+            const zoomLevel = mapInstance.getZoom();
             for (let [name, [lat, lng]] of Object.entries(stations)) {
                 if (allStations.includes(name)) {
                     let markerIcon;
@@ -1320,11 +1322,14 @@
                             更新時間: ${timeStr}
                         `;
                         const isVisible = visibleStations.includes(name);
+                        const markerSize = isVisible ? 45 : 30;
+                        const fontSize = isVisible ? 30 : 20;
+                        const anchorY = isVisible ? 45 : 30;
                         markerIcon = L.divIcon({
                             className: 'custom-marker',
-                            html: `<div style="font-size: 20px; transform: translate(-50%, -30px);${isVisible ? ' background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;' : ''}">${emoji}</div>`,
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 30]
+                            html: `<div style="font-size: ${fontSize}px; transform: translate(-50%, -${anchorY}px); background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;">${emoji}</div>`,
+                            iconSize: [markerSize, markerSize],
+                            iconAnchor: [markerSize / 2, anchorY]
                         });
                     } else {
                         markerIcon = L.divIcon({
@@ -1372,6 +1377,9 @@
             }
             isInitialized = true;
             console.log('Initializing page...');
+
+            // 生成星星
+            createStars();
 
             // 綁定分頁點擊事件
             document.querySelectorAll('.tab').forEach(tab => {
