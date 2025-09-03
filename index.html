@@ -593,7 +593,6 @@
             <li><a href="https://wwtf.twport.com.tw/twport/display/Realtime_Panel_Port_2024.html?1" target="_blank">基隆港-海氣象資訊 | 商港海氣象資訊系統</a></li>
             <li><a href="https://keelungcwa.github.io/TaiwanWeatherLive/" target="_blank">臺灣各區海氣象即時影像</a></li>
             <li><a href="https://keelungcwa.github.io/CWA_WeatherStation_SOP/" target="_blank">氣象站轉型監測預報席作業SOP - 異常狀況處理互動決策樹</a></li>            
-
         </ul>
     </div>
 
@@ -1120,7 +1119,8 @@
                         backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
                         tension: 0.1,
                         borderWidth: 2,
-                        fill: false
+                        fill: false,
+                        pointRadius: 1.5  // 將點大小縮小一半
                     });
                     datasets.humidity.push({
                         label: station,
@@ -1129,7 +1129,8 @@
                         backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
                         tension: 0.1,
                         borderWidth: 2,
-                        fill: false
+                        fill: false,
+                        pointRadius: 1.5  // 將點大小縮小一半
                     });
                     datasets.windSpeed.push({
                         label: station,
@@ -1138,7 +1139,8 @@
                         backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
                         tension: 0.1,
                         borderWidth: 2,
-                        fill: false
+                        fill: false,
+                        pointRadius: 1.5  // 將點大小縮小一半
                     });
                 }
             });
@@ -1433,5 +1435,3 @@
     </script>
 </body>
 </html>
-
-
