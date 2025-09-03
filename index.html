@@ -235,7 +235,7 @@
             color: #fff;
             transform: scale(1.05);
         }
-        .image-grid {
+        .image-grid, .marine-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 10px;
@@ -255,32 +255,6 @@
         .image-container img, .image-container iframe {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            border: none;
-            display: block;
-            margin: 0 auto;
-        }
-        .marine-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 10px;
-            height: auto;
-        }
-        .marine-grid .image-container {
-            width: 100%;
-            height: 400px;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .marine-grid .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border: none;
-        }
-        .marine-grid .image-container iframe {
-            width: 90%;
-            height: 90%;
             object-fit: contain;
             border: none;
             display: block;
@@ -365,11 +339,8 @@
             opacity: 1;
         }
         @media (min-width: 769px) {
-            .image-grid {
+            .image-grid, .marine-grid {
                 grid-template-columns: repeat(4, 1fr);
-            }
-            .marine-grid {
-                grid-template-columns: repeat(3, 1fr);
             }
             .chart-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -387,11 +358,10 @@
                 height: 200px;
                 overflow-y: auto;
             }
-            .image-grid { grid-template-columns: 1fr; }
+            .image-grid, .marine-grid { grid-template-columns: 1fr; }
             .image-container { height: 250px; }
             #keelungCard .image-container { height: 275px; }
-            .marine-grid .image-container { height: 300px; }
-            .surge-container { height: 300px; }
+            .surge-container { height: 250px; }
             .forecast-container, .yunbot-container, .coastal-container { height: 400px; }
             h1 { font-size: 1.3em; }
             .title-logo { width: 28px; height: 28px; }
@@ -427,6 +397,7 @@
         <div class="tab" data-tab="coastal">鄉鎮沿海預報 🛳️</div>
         <div class="tab" data-tab="yunbot">雲寶問天氣 🤖</div>
         <div class="tab" data-tab="keelungCard">氣象站圖卡 🎏</div>
+        <div class="tab" data-tab="relatedLinks">相關網站 🔗</div>
     </div>
 
     <!-- 第 1 頁面：天氣圖資（2*4 佈局） -->
@@ -467,9 +438,13 @@
         </div>
     </div>
 
-    <!-- 第 2 頁面：海象圖資（2*3 佈局） -->
+    <!-- 第 2 頁面：海象圖資（2*4 佈局） -->
     <div id="marine" class="tab-content">
-        <div class="marine-grid">
+        <div class="image-grid">
+            <div class="image-container">
+                <h3>基隆北海岸沿海與異常浪預報</h3>
+                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan01.png" alt="基隆北海岸沿海與異常浪預報">
+            </div>
             <div class="image-container">
                 <h3>潮浪柱狀圖</h3>
                 <div class="surge-container">
@@ -496,6 +471,10 @@
             <div class="image-container">
                 <h3>潮高預報圖</h3>
                 <img src="https://www.cwa.gov.tw/Data/marine/tide_height_CH/cht/3day/1516_1.png" alt="基隆潮位圖">
+            </div>
+            <div class="image-container">
+                <h3>滿潮預報圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/marine/tide_predict/full_0.png" alt="滿潮預報圖">
             </div>
         </div>
     </div>
@@ -602,9 +581,20 @@
         <p><strong>作者：基隆氣象站 鄧乃誠</strong></p>
     </div>
 
+    <!-- 相關網站 -->
+    <div id="relatedLinks" class="tab-content">
+        <h3>相關網站</h3>
+        <p>以下為與基隆氣象站相關的網站連結，提供更多氣象資訊與服務：</p>
+        <ul>
+            <li><a href="https://keelungcwa.github.io/TaiwanWeatherLive/" target="_blank">臺灣各區海氣象即時影像</a></li>
+            <li><a href="https://keelungcwa.github.io/CWA_WeatherStation_SOP/" target="_blank">氣象站轉型監測預報席作業SOP - 異常狀況處理互動決策樹</a></li>
+            <li><a href="https://www.cwa.gov.tw/V8/C/A/organ/46694.html" target="_blank">基隆氣象站 | 交通部中央氣象署</a></li>
+        </ul>
+    </div>
+
     <!-- 底部資訊 -->
     <footer>
-        <p>| <a id="aboutLink" href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a> | 
+        <p>| <a id="aboutLink" href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a> | <a id="relatedLinks" href="javascript:void(0)" data-tab="relatedLinks">相關網站</a> | 
            <span class="social-icons">
                <a href="https://www.facebook.com/keelungcwb" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
                <a href="https://maps.app.goo.gl/KTwwkkC9LxZeFJhF8" target="_blank" title="Google Maps"><i class="fas fa-map-marker-alt"></i></a>
@@ -1185,22 +1175,20 @@
                 }
             };
 
-            // 計算溫度數據範圍並過濾異常值
+            // 計算溫度數據範圍並動態調整 Y 軸
             const tempValues = datasets.temperature
                 .flatMap(d => d.data.map(p => p.y))
                 .filter(v => v != null && v !== -99 && v >= -10 && v <= 50);
             let yAxisMin = 20;
-            let yAxisMax = 25;
+            let yAxisMax = 36;
             if (tempValues.length > 0) {
                 const dataMin = Math.min(...tempValues);
                 const dataMax = Math.max(...tempValues);
                 console.log(`溫度數據範圍：最小值 ${dataMin}°C，最大值 ${dataMax}°C`);
-                if (dataMin < 20 || dataMax > 25) {
-                    yAxisMin = Math.floor(dataMin / 5) * 5 - 1;
-                    yAxisMax = Math.ceil(dataMax / 5) * 5 + 1;
-                }
+                if (dataMin < 20) yAxisMin = Math.floor(dataMin / 5) * 5 - 1;
+                if (dataMax > 36) yAxisMax = Math.ceil(dataMax / 5) * 5 + 1;
             } else {
-                console.warn('無有效溫度數據，使用預設範圍 20~25°C');
+                console.warn('無有效溫度數據，使用預設範圍 20~36°C');
             }
 
             tempChart = new Chart(document.getElementById('temperatureChart'), {
@@ -1419,6 +1407,17 @@
             } else {
                 console.error('About link not found');
                 showToast('無法載入「關於本網站」，請稍後重試');
+            }
+
+            const relatedLinks = document.getElementById('relatedLinks');
+            if (relatedLinks) {
+                relatedLinks.addEventListener('click', () => {
+                    console.log('Related links clicked');
+                    showTab('relatedLinks');
+                });
+            } else {
+                console.error('Related links not found');
+                showToast('無法載入「相關網站」，請稍後重試');
             }
 
             loadAndPlotData();
