@@ -1,5 +1,4 @@
 基隆氣象站 山海好厝邊 🌧️🏞️
-
 基隆氣象站 山海好厝邊 是一個專注於基隆北海岸氣象資訊的網站，旨在提供簡單清晰、便民實用的天氣與海象數據，服務機關與民眾。本網站整合中央氣象署及其他單位的氣象產品，透過直觀的圖表、地圖與圖資呈現，支援手機與電腦瀏覽，成為基隆北海岸最值得信賴的氣象好厝邊！
 功能特色
 
@@ -32,53 +31,11 @@ Windy.com（風速流場、海溫預報）
 國家災害防救科技中心（浪高動態圖）
 
 
-部署：GitHub Pages（https://keelungcwa.github.io/）
 分析：Google Analytics（追蹤網站使用情況）
-
-安裝與部署
-前置條件
-
-瀏覽器：支援現代瀏覽器（Chrome、Firefox、Safari、Edge）
-資料檔案：data/keelung_data.json（包含測站天氣數據）
-圖片資源：確保 /assets/ 目錄包含 keelung_weather_preview.jpg（社群分享預覽圖）
-
-本地運行
-
-克隆專案：git clone https://github.com/keelungcwa/keelungcwa.git
-cd keelungcwa
-
-
-安裝簡單 HTTP 伺服器（例如 Python 的 http.server）：python3 -m http.server 8000
-
-
-打開瀏覽器，訪問 http://localhost:8000。
-確保 data/keelung_data.json 放置於 data/ 目錄，格式如下：[
-    {
-        "station_name": "基隆",
-        "time": "2025-04-16T12:00:00",
-        "weather_elements": {
-            "AirTemperature": 25.5,
-            "RelativeHumidity": 80,
-            "WindSpeed": 5.2,
-            "Precipitation": 0,
-            "Weather": "晴"
-        }
-    },
-    ...
-]
-
-
-
-部署到 GitHub Pages
-
-確保專案根目錄包含 index.html 和必要的資料、圖片檔案。
-在 GitHub 專案設置中啟用 GitHub Pages，選擇 main 分支的 / (root) 目錄。
-部署後，訪問 https://keelungcwa.github.io/。
-確認圖片 URL（如 https://keelungcwa.github.io/assets/keelung_weather_preview.jpg）可公開訪問。
 
 使用說明
 
-瀏覽網站：訪問 https://keelungcwa.github.io/，首頁顯示基隆最新天氣資訊。
+瀏覽網站：訪問網站首頁，查看基隆最新天氣資訊。
 切換分頁：
 天氣圖資 ☁️：查看雷達、雨量、衛星等圖資。
 海象圖資 🌊：瀏覽潮浪、浪高、海溫等數據。
@@ -94,46 +51,13 @@ cd keelungcwa
 在排行榜切換「最高溫」「最低溫」「風速」「雨量」，查看前 5 名。
 
 
-社群分享：
-複製網站 URL，分享至 Facebook、Twitter、LINE 等平台。
-預覽圖（keelung_weather_preview.jpg）將自動顯示，包含標題與描述。
-
-
-
-測試與驗證
-
-資料載入：確認 keelung_data.json 格式正確，時間可解析，數據完整。
-排行榜：檢查「今日」與「現在」欄顯示排序 1~5，雙直線分隔清晰。
-天氣表情符號：測試「晴」在 06:0018:00 顯示 ☀️，18:0006:00 顯示 🌙。
-手機適配：在手機上測試表格、圖表、地圖的顯示效果。
-社群預覽：
-使用 Facebook Sharing Debugger 測試 Open Graph。
-使用 Twitter Card Validator 驗證 Twitter Card。
-確認預覽圖尺寸（1200x630）與內容正確。
-
-
+社群分享：複製網站 URL，分享至 Facebook、Twitter、LINE 等平台，預覽圖將自動顯示。
 
 注意事項
 
 資料來源：部分圖資來自中央氣象署以外的單位，請以官方預報為準。
-圖片資源：確保 /assets/ 目錄的圖片（特別是 keelung_weather_preview.jpg）可公開訪問。
-快取問題：社群平台可能快取舊預覽圖，使用 Debugger 工具清除快取。
+圖片資源：確保社群分享預覽圖（1200x630 像素）可公開訪問。
 版權：網站圖片與資料需遵守中央氣象署及其他單位的版權規定，轉載請註明出處。
-
-貢獻指南
-歡迎對本專案提出建議或貢獻程式碼！請遵循以下步驟：
-
-Fork 本專案。
-創建新分支：git checkout -b feature/你的功能
-
-
-提交更改：git commit -m "新增/修復：描述你的更改"
-
-
-推送到遠端：git push origin feature/你的功能
-
-
-提交 Pull Request，詳細描述你的變更。
 
 聯繫方式
 
@@ -143,7 +67,72 @@ Fork 本專案。
 電子郵件：keelung@cwa.gov.tw
 服務時間：09:00 至 17:00
 
-版權
-中央氣象署基隆氣象站 版權所有，轉載請註明出處。
 
-讓我們一起打造基隆北海岸最實用的氣象資訊平台！ 🌊☁️
+Keelung Weather Station: Your Coastal Companion 🌧️🏞️
+Keelung Weather Station: Your Coastal Companion is a website dedicated to providing clear, user-friendly weather and marine data for Keelung’s North Coast. Integrating resources from the Central Weather Administration and other sources, it presents intuitive charts, maps, and visuals, optimized for both mobile and desktop. Your trusted weather companion for Keelung’s North Coast!
+Features
+
+Real-Time Weather: Displays Keelung’s latest weather (temperature, humidity, rainfall, wind speed) with dynamic date display and weather emojis (☀️ Sunny, 🌙 Clear Night, 🌧️ Rain, etc.).
+Diverse Visualizations:
+Weather Data: Radar echoes, cumulative rainfall, true-color satellite imagery, wind flow fields (2x4 layout).
+Marine Data: Tide and wave histograms, wave height forecasts, sea temperature, and currents (2x3 layout).
+
+
+Keelung North Coast Section:
+Interactive station map for switching between station data.
+Time-series charts for temperature, humidity, and wind speed, showing the past 24 hours.
+Rainfall distribution map visualizing recent precipitation.
+Observation Rankings (6 rows x 8 columns), comparing “Today” and “Now” for top 5 highest/lowest temperature, wind speed, and rainfall, with rankings 1–5 and a double-line separator between columns 4 and 5.
+
+
+Weather Forecasts: Integrates Central Weather Administration forecasts for Keelung and coastal townships.
+CloudBot Weather Chat: Embeds the Central Weather Administration’s CloudBot chatbot.
+Station Showcase: Displays featured images of Keelung Weather Station.
+Social Sharing Optimization: Supports Open Graph and Twitter Card for beautiful previews (1200x630 pixels) when shared on social media.
+
+Tech Stack
+
+Frontend: HTML5, CSS3, JavaScript
+Chart Library: Chart.js (for time-series and rainfall distribution charts)
+Map: Leaflet.js (for interactive station map)
+External Resources:
+Central Weather Administration (radar, satellite, forecasts)
+Windy.com (wind flow fields, sea temperature forecasts)
+National Center for Disaster Reduction (wave height animations)
+
+
+Analytics: Google Analytics (tracking website usage)
+
+Usage Instructions
+
+Visit the Website: Access the homepage to view Keelung’s latest weather information.
+Navigate Tabs:
+Weather Visuals ☁️: View radar, rainfall, satellite, and other data.
+Marine Visuals 🌊: Explore tides, wave heights, sea temperatures, and more.
+Keelung North Coast ❤️: Check station maps, time-series charts, and rankings.
+Weather Forecast ⛅: Review Keelung regional forecasts.
+Coastal Township Forecast 🛳️: See coastal township weather.
+CloudBot Weather 🤖: Interact with the CloudBot chatbot.
+Station Showcase 🎏: Browse featured station images.
+
+
+Interactive Features:
+Click map markers to switch stations and update time-series data.
+Toggle rankings for highest/lowest temperature, wind speed, or rainfall to view top 5.
+
+
+Social Sharing: Copy the website URL and share on Facebook, Twitter, LINE, etc., with automatic preview images.
+
+Notes
+
+Data Sources: Some data comes from sources beyond the Central Weather Administration; always refer to official forecasts.
+Image Resources: Ensure social sharing preview images (1200x630 pixels) are publicly accessible.
+Copyright: Images and data must comply with Central Weather Administration and other sources’ copyright rules; cite sources when republishing.
+
+Contact
+
+Author: Nai-Cheng Teng, Keelung Weather Station
+Address: 6F, Harbor Building, No. 6, Gangxi St., Ren’ai District, Keelung City 200
+Phone: (02) 2422-4240
+Email: keelung@cwa.gov.tw
+Service Hours: 09:00–17:00
