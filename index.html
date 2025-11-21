@@ -442,7 +442,7 @@
     <div id="marine" class="tab-content">
         <div class="image-grid">
             <div class="image-container">
-                <h3>沿海與異常浪預報</h3>
+                <h3>沿海與異常浪預報(建置中)</h3>
                 <img src="https://raw.githubusercontent.com/keelungcwa/CWA_Waverisk/refs/heads/main/images/CWA_waverisk.png" alt="基隆北海岸沿海與異常浪預報">
             </div>
             <div class="image-container">
@@ -1182,6 +1182,22 @@
                 }
             };
 
+            // 計算溫度數據範圍並動態調整 Y 軸
+            const tempValues = datasets.temperature
+                .flatMap(d => d.data.map(p => p.y))
+                .filter(v => v != null && v !== -99 && v >= -10 && v <= 50);
+            let yAxisMin = 20;
+            let yAxisMax = 22;
+            if (tempValues.length > 0) {
+                const dataMin = Math.min(...tempValues);
+                const dataMax = Math.max(...tempValues);
+                console.log(`溫度數據範圍：最小值 ${dataMin}°C，最大值 ${dataMax}°C`);
+                if (dataMin < 20) yAxisMin = Math.floor(dataMin / 5) * 5 - 1;
+                if (dataMax > 22) yAxisMax = Math.ceil(dataMax / 5) * 5 + 1;
+            } else {
+                console.warn('無有效溫度數據，使用預設範圍 20~22°C');
+            }
+
             tempChart = new Chart(document.getElementById('temperatureChart'), {
                 type: chartType,
                 data: { datasets: datasets.temperature },
@@ -1202,6 +1218,8 @@
                                 font: { size: window.innerWidth > 768 ? 12 : 10 },
                                 stepSize: 2
                             },
+                            min: yAxisMin,
+                            max: yAxisMax
                         }
                     }
                 }
@@ -1417,10 +1435,6 @@
     </script>
 </body>
 </html>
-
-
-
-
 
 
 
