@@ -1182,22 +1182,6 @@
                 }
             };
 
-            // 計算溫度數據範圍並動態調整 Y 軸
-            const tempValues = datasets.temperature
-                .flatMap(d => d.data.map(p => p.y))
-                .filter(v => v != null && v !== -99 && v >= -10 && v <= 50);
-            let yAxisMin = 20;
-            let yAxisMax = 36;
-            if (tempValues.length > 0) {
-                const dataMin = Math.min(...tempValues);
-                const dataMax = Math.max(...tempValues);
-                console.log(`溫度數據範圍：最小值 ${dataMin}°C，最大值 ${dataMax}°C`);
-                if (dataMin < 20) yAxisMin = Math.floor(dataMin / 5) * 5 - 1;
-                if (dataMax > 36) yAxisMax = Math.ceil(dataMax / 5) * 5 + 1;
-            } else {
-                console.warn('無有效溫度數據，使用預設範圍 20~36°C');
-            }
-
             tempChart = new Chart(document.getElementById('temperatureChart'), {
                 type: chartType,
                 data: { datasets: datasets.temperature },
@@ -1213,7 +1197,7 @@
                             ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } } 
                         },
                         y: { 
-                            title: { display: true, text: '溫度 (°C) 🌡️', font: { size: window.innerWidth > 768 ? 14 : 12 } }, 
+                            title: { display: true, text: '溫度 (°C)', font: { size: window.innerWidth > 768 ? 14 : 12 } }, 
                             ticks: { 
                                 font: { size: window.innerWidth > 768 ? 12 : 10 },
                                 stepSize: 2
@@ -1435,6 +1419,7 @@
     </script>
 </body>
 </html>
+
 
 
 
