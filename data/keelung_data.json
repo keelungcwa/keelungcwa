@@ -136990,5 +136990,469 @@
             "Weather": "晴"
         },
         "source": "O-A0001-001"
+    },
+    {
+        "station_name": "基隆",
+        "station_id": "466940",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 19.9,
+            "RelativeHumidity": 64.0,
+            "WindSpeed": 4.5,
+            "WindDirection": 360.0,
+            "Precipitation": 0.0,
+            "AirPressure": 1012.5,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "淡水",
+        "station_id": "466900",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 20.2,
+            "RelativeHumidity": 75.0,
+            "WindSpeed": 1.1,
+            "WindDirection": 280.0,
+            "Precipitation": 0.0,
+            "AirPressure": 1013.6,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "新北",
+        "station_id": "466881",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.8,
+            "RelativeHumidity": 31.0,
+            "WindSpeed": 1.3,
+            "WindDirection": 300.0,
+            "Precipitation": 0.0,
+            "AirPressure": 1012.3,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "彭佳嶼",
+        "station_id": "466950",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 21.3,
+            "RelativeHumidity": 74.0,
+            "WindSpeed": 6.2,
+            "WindDirection": 270.0,
+            "Precipitation": 0.0,
+            "AirPressure": 1004.1,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "文山茶改",
+        "station_id": "82A750",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 21.9,
+            "RelativeHumidity": 32.0,
+            "WindSpeed": 0.8,
+            "WindDirection": 300.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "桃改臺北",
+        "station_id": "72AI40",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 24.2,
+            "RelativeHumidity": 30.0,
+            "WindSpeed": 0.0,
+            "WindDirection": 0.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "富貴角",
+        "station_id": "C2A920",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 19.7,
+            "RelativeHumidity": 67.0,
+            "WindSpeed": 1.6,
+            "WindDirection": 290.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "福隆",
+        "station_id": "C2A880",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.1,
+            "RelativeHumidity": 57.0,
+            "WindSpeed": 1.3,
+            "WindDirection": 30.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "四堵",
+        "station_id": "C2A540",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 21.5,
+            "RelativeHumidity": 25.0,
+            "WindSpeed": 0.5,
+            "WindDirection": 220.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "福山",
+        "station_id": "C2A560",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 22.6,
+            "RelativeHumidity": 33.0,
+            "WindSpeed": 1.6,
+            "WindDirection": 340.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "瑞芳",
+        "station_id": "C2A660",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 22.8,
+            "RelativeHumidity": 57.0,
+            "WindSpeed": 1.3,
+            "WindDirection": 20.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "火燒寮",
+        "station_id": "C2A650",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.0,
+            "RelativeHumidity": 33.0,
+            "WindSpeed": 1.3,
+            "WindDirection": 190.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三N002K",
+        "station_id": "CAB050",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 21.5,
+            "RelativeHumidity": 70.0,
+            "WindSpeed": 1.1,
+            "WindDirection": 20.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三S004K",
+        "station_id": "CAB030",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 22.3,
+            "RelativeHumidity": 64.0,
+            "WindSpeed": 1.7,
+            "WindDirection": 50.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三S007K",
+        "station_id": "CAB040",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 25.3,
+            "RelativeHumidity": 44.0,
+            "WindSpeed": 0.6,
+            "WindDirection": 200.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三S010K",
+        "station_id": "CAA030",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 24.5,
+            "RelativeHumidity": 32.0,
+            "WindSpeed": 1.3,
+            "WindDirection": 150.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三S037K",
+        "station_id": "CAA050",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 24.1,
+            "RelativeHumidity": 41.0,
+            "WindSpeed": 0.8,
+            "WindDirection": 60.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三S042K",
+        "station_id": "CAA060",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 24.5,
+            "RelativeHumidity": 42.0,
+            "WindSpeed": 0.9,
+            "WindDirection": 170.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三N046K",
+        "station_id": "CAA070",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 24.1,
+            "RelativeHumidity": 43.0,
+            "WindSpeed": 1.0,
+            "WindDirection": 100.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國一N039K",
+        "station_id": "CAA990",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 22.3,
+            "RelativeHumidity": 59.0,
+            "WindSpeed": 0.8,
+            "WindDirection": 180.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "多雲"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國五S005K",
+        "station_id": "CAAD60",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.8,
+            "RelativeHumidity": 31.0,
+            "WindSpeed": 0.6,
+            "WindDirection": 150.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國五S006K",
+        "station_id": "CAAD70",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 22.8,
+            "RelativeHumidity": 38.0,
+            "WindSpeed": 0.4,
+            "WindDirection": 120.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國五N008K",
+        "station_id": "CAAD80",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 22.2,
+            "RelativeHumidity": 38.0,
+            "WindSpeed": 2.2,
+            "WindDirection": 360.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴有霾"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國五N013K",
+        "station_id": "CAAD90",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.5,
+            "RelativeHumidity": 27.0,
+            "WindSpeed": 0.9,
+            "WindDirection": 280.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國三S054K",
+        "station_id": "CAA080",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.8,
+            "RelativeHumidity": 42.0,
+            "WindSpeed": 1.5,
+            "WindDirection": 340.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "陰"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國一S001K",
+        "station_id": "CAB010",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 21.3,
+            "RelativeHumidity": 72.0,
+            "WindSpeed": 3.0,
+            "WindDirection": 20.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國一S006K",
+        "station_id": "CAB020",
+        "county": "基隆市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 23.0,
+            "RelativeHumidity": 63.0,
+            "WindSpeed": 3.6,
+            "WindDirection": 70.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國一N013K",
+        "station_id": "CAA010",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 25.3,
+            "RelativeHumidity": 42.0,
+            "WindSpeed": 0.9,
+            "WindDirection": 160.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
+    },
+    {
+        "station_name": "國一S026K",
+        "station_id": "CAA020",
+        "county": "新北市",
+        "time": "2026-01-15T13:40:00+08:00",
+        "weather_elements": {
+            "AirTemperature": 24.0,
+            "RelativeHumidity": 55.0,
+            "WindSpeed": 1.3,
+            "WindDirection": 340.0,
+            "Precipitation": 0.0,
+            "AirPressure": null,
+            "Weather": "晴"
+        },
+        "source": "O-A0003-001"
     }
 ]
