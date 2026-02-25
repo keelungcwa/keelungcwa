@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
+    <meta name="author" content="基隆氣象站 鄧乃誠">
+    <meta name="robots" content="index, follow">
+    <title>基隆氣象站 山海好厝邊</title>
+    <link rel="icon" type="image/png" href="https://keelungcwa.github.io/keelungcwa/images/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D74WCKD2S0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-D74WCKD2S0');
+    </script>
+    <!-- Open Graph 設定 -->
+    <meta property="og:title" content="基隆氣象站 山海好厝邊">
+    <meta property="og:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta property="og:image" content="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png">
+    <meta property="og:url" content="https://keelungcwa.github.io/">
+    <meta property="og:type" content="website">
+   
+    <!-- Twitter Card 設定 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="基隆氣象站 山海好厝邊">
+    <meta name="twitter:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta name="twitter:image" content="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 1s ease;
+        }
+        body.sunny {
+            background: linear-gradient(135deg, #fffacd 0%, #ffffff 100%);
+        }
+        body.night {
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+        }
+        body.cloudy {
+            background: linear-gradient(135deg, #e6f0fa 0%, #3498db 100%);
+        }
+        body.rainy, body.thunder {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a252f 100%);
+        }
+        body.foggy, body.haze, body.mist {
+            background: linear-gradient(135deg, #f5f6f5 0%, #e0e6e8 100%);
+        }
+        body.thunder h1, body.rainy h1, body.night h1 {
+            color: #ffffff;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        .title-logo {
+            width: 32px;
+            height: 32px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        #rainCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: none;
+        }
+        body.rainy #rainCanvas, body.thunder #rainCanvas {
+            display: block;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: none;
+        }
+        body.night .stars {
+            display: block;
+        }
+        .star {
+            position: absolute;
+            color: #ffff00;
+            font-size: 16px;
+            animation: twinkle linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        h1 {
+            font-size: 1.5em;
+            color: #000000;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        h3 {
+            font-size: 1em;
+            margin: 5px 0;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .weather-info {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 0.9em;
+            position: relative;
+            z-index: 1;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #ecf0f1;
+            border: none;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+        .tab:hover {
+            background-color: #dfe6e9;
+        }
+        .tab.active {
+            background-color: #2980b9;
+            color: #fff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: auto;
+            gap: 10px;
+        }
+        .chart-container, .ranking-container {
+            width: 95%;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .ranking-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+        .ranking-container th, .ranking-container td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+        .ranking-container th:last-child, .ranking-container td:last-child {
+            border-right: none;
+        }
+        .ranking-container th:nth-child(4), .ranking-container td:nth-child(4) {
+            border-right: 2px double #333;
+        }
+        .ranking-container th {
+            background-color: #2980b9;
+            color: #fff;
+        }
+        .ranking-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .ranking-buttons button {
+            background-color: #ecf0f1;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .ranking-buttons button:hover {
+            background-color: #dfe6e9;
+        }
+        .ranking-buttons button.active {
+            background-color: #1b5e91;
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .image-grid, .marine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            height: auto;
+        }
+        .image-container {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        #keelungCard .image-container {
+            height: 330px;
+        }
+        .image-container img, .image-container iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border: none;
+            display: block;
+            margin: 0 auto;
+        }
+        .surge-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            height: 100%;
+            overflow-y: auto;
+        }
+        .surge-container img {
+            flex: 1;
+            height: 50%;
+            object-fit: contain;
+        }
+        .forecast-container, .coastal-container, .yunbot-container {
+            width: 100%;
+            height: 500px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .forecast-container iframe, .coastal-container iframe, .yunbot-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        footer {
+            margin-top: auto;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #2c3e50;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        footer p {
+            margin: 5px 0;
+        }
+        footer a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .social-icons a {
+            margin: 0 8px;
+            font-size: 1.2em;
+            transition: color 0.3s ease;
+        }
+        .social-icons a:hover {
+            color: #2c3e50;
+        }
+        .toast {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .toast.show {
+            opacity: 1;
+        }
+        @media (min-width: 769px) {
+            .image-grid, .marine-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            .chart-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-container, .ranking-container, #map {
+                height: 275px;
+            }
+        }
+        @media (max-width: 768px) {
+            .tabs { flex-direction: column; align-items: center; }
+            .tab { width: 100%; text-align: center; padding: 8px; font-size: 0.85em; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .chart-container, .ranking-container, #map { height: 220px; }
+            .ranking-container {
+                height: 200px;
+                overflow-y: auto;
+            }
+            .image-grid, .marine-grid { grid-template-columns: 1fr; }
+            .image-container { height: 250px; }
+            #keelungCard .image-container { height: 275px; }
+            .surge-container { height: 250px; }
+            .forecast-container, .yunbot-container, .coastal-container { height: 400px; }
+            h1 { font-size: 1.3em; }
+            .title-logo { width: 28px; height: 28px; }
+            h3 { font-size: 1em; }
+            p { font-size: 0.9em; }
+            footer { font-size: 0.7em; }
+            .ranking-container table {
+                font-size: 0.75em;
+            }
+            .ranking-container th, .ranking-container td {
+                padding: 5px;
+            }
+            .toast {
+                top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="rainCanvas"></canvas>
+    <div class="stars"></div>
+    <h1><img src="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png" alt="基隆氣象站 Logo" class="title-logo">基隆氣象站 山海好厝邊</h1>
+    <!-- 最新天氣觀測 -->
+    <div class="weather-info" id="latestWeather">載入基隆最新天氣資料中...</div>
+    <!-- 分頁選單 -->
+    <div class="tabs">
+        <div class="tab active" data-tab="weatherCharts">天氣圖資 ☁️</div>
+        <div class="tab" data-tab="marine">海象圖資 🌊</div>
+        <div class="tab" data-tab="charts">基隆北海岸🏞️</div>
+        <div class="tab" data-tab="forecast">天氣預報 ⛅</div>
+        <div class="tab" data-tab="coastal">鄉鎮沿海預報 🛳️</div>
+        <div class="tab" data-tab="climate">基隆氣候 📈</div>
+        <div class="tab" data-tab="keelungCard">氣象站圖卡 🎏</div>
+        <div class="tab" data-tab="relatedLinks">相關網站 🔗</div>
+    </div>
+    <!-- 第 1 頁面：天氣圖資（2*4 佈局） -->
+    <div id="weatherCharts" class="tab-content active">
+        <div class="image-grid">
+            <div class="image-container">
+                <h3>雷達回波圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/radar/CV1_TW_1000_forPreview.png" alt="基隆地區最新雷達回波圖">
+            </div>
+            <div class="image-container">
+                <h3>累積雨量圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/rainfall/QZJ_forPreview.jpg" alt="基隆地區累積雨量圖">
+            </div>
+            <div class="image-container">
+                <h3>真實色衛星雲圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/satellite/TWI_TRGB_1000/TWI_TRGB_1000.jpg" alt="真實色衛星雲圖">
+            </div>
+            <div class="image-container">
+                <h3>風速流場</h3>
+                <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=m/s&zoom=5&overlay=wind&product=ecmwf&level=surface&lat=24.036&lon=120.595&pressure=true&message=true" frameborder="0" allow="geolocation"></iframe>
+            </div>
+            <div class="image-container">
+                <h3>溫度分布圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/temperature/temp_forPreview.jpg" alt="基隆地區溫度分布圖">
+            </div>
+            <div class="image-container">
+                <h3>閃電觀測圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/lightning/lightning_s.jpg" alt="基隆地區閃電觀測圖">
+            </div>
+            <div class="image-container">
+                <h3>地面天氣圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/FI04.png" alt="地面天氣圖">
+            </div>
+            <div class="image-container">
+                <h3>定量降水預報</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/QPF_ChFcstPrecip_12_12.png" alt="定量降水預報">
+            </div>
+        </div>
+    </div>
+    <!-- 第 2 頁面：海象圖資（2*4 佈局） -->
+    <div id="marine" class="tab-content">
+        <div class="image-grid">
+            <div class="image-container">
+                <h3>沿海與異常浪預報</h3>
+                <img src="https://raw.githubusercontent.com/keelungcwa/CWA_Waverisk/refs/heads/main/images/CWA_waverisk.png" alt="基隆北海岸沿海與異常浪預報">
+            </div>
+            <div class="image-container">
+                <h3>潮浪柱狀圖</h3>
+                <div class="surge-container">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan01.png" alt="潮浪柱狀圖 01">
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan02.png" alt="潮浪柱狀圖 02">
+                </div>
+            </div>
+            <div class="image-container">
+                <h3>潮浪監測地圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
+            </div>
+            <div class="image-container">
+                <h3>波浪分析圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/fcst_img/FI12_Small.jpg" alt="波浪分析圖">
+            </div>
+            <div class="image-container">
+                <h3>浪高預報</h3>
+                <img id="waveGif" src="https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/202503/2025032500/2025032500.gif" alt="波浪動態圖">
+            </div>
+            <div class="image-container">
+                <h3>海溫預報與海流</h3>
+                <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=°C&metricWind=default&zoom=6&overlay=sst&product=ecmwfAnalysis&level=surface&lat=23.546&lon=121.482" frameborder="0" allow="geolocation"></iframe>
+            </div>
+            <div class="image-container">
+                <h3>潮高預報圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/marine/tide_height_CH/cht/3day/1516_1.png" alt="基隆潮位圖">
+            </div>
+            <div class="image-container">
+                <h3>滿潮預報圖</h3>
+                <img src="https://www.cwa.gov.tw/Data/marine/tide_predict/full_0.png" alt="滿潮預報圖">
+            </div>
+        </div>
+    </div>
+    <!-- 第 3 頁面：基隆北海岸 -->
+    <div id="charts" class="tab-content">
+        <div class="chart-grid">
+            <div class="ranking-container">
+                <h3>觀測排行榜 🏆</h3>
+                <div class="ranking-buttons">
+                    <button onclick="updateRankingTable('maxTemperature')" class="active">最高溫(℃)</button>
+                    <button onclick="updateRankingTable('minTemperature')">最低溫(℃)</button>
+                    <button onclick="updateRankingTable('windSpeed')">風速(m/s)</button>
+                    <button onclick="updateRankingTable('precipitation')">雨量(mm)</button>
+                </div>
+                <table id="rankingTable">
+                    <thead>
+                        <tr>
+                            <th>今日</th>
+                            <th>站點</th>
+                            <th>數值</th>
+                            <th>時間</th>
+                            <th>現在</th>
+                            <th>站點</th>
+                            <th>數值</th>
+                            <th>時間</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="chart-container">
+                <h3>測站最新天氣地圖 🗺️</h3>
+                <div id="map"></div>
+            </div>
+            <div class="chart-container">
+                <h3>溫度時序圖 🌡️</h3>
+                <canvas id="temperatureChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>濕度時序圖 💧</h3>
+                <canvas id="humidityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>風速時序圖 💨</h3>
+                <canvas id="windSpeedChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>雨量分布圖 🌧️</h3>
+                <canvas id="precipitationChart"></canvas>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 0.9em; margin-top: 10px;">點擊地圖標記開啟/關閉測站數據</p>
+    </div>
+    <!-- 第 4 頁面：天氣預報 -->
+    <div id="forecast" class="tab-content">
+        <div class="forecast-container">
+            <iframe src="https://www.cwa.gov.tw/V8/C/W/County/County.html?CID=10017" frameborder="0"></iframe>
+        </div>
+    </div>
+    <!-- 第 5 頁面：鄉鎮沿海預報 -->
+    <div id="coastal" class="tab-content">
+        <div class="coastal-container">
+            <iframe src="https://www.cwa.gov.tw/V8/C/M/TownCoastal/TownCoastal.html?cID=10017&pointID=1001705C01" frameborder="0" allow="geolocation"></iframe>
+        </div>
+    </div>
+<!-- 第 6 頁面：基隆氣候 -->
+<div id="climate" class="tab-content">
+    <div style="text-align: center; margin-bottom: 15px;">
+        <h2 style="margin:0; font-size: 1.2em; color: #2c3e50;">基隆氣象站 氣候統計</h2>
+        <small>數據來源：交通部中央氣象署</small>
+    </div>
+
+    <div class="chart-grid">
+        <!-- 原有四張圖表容器 -->
+        <div class="chart-container">
+            <h3>氣溫 (℃) 🌡️　年平均：22.8</h3>
+            <canvas id="climateTempChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>降雨量 (mm) 🌧️　年平均總計：3590</h3>
+            <canvas id="climateRainChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>日照時數與雨日 ☀️　</h3>
+            <canvas id="climateSunRainChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>風速 (m/s) 💨　</h3>
+            <canvas id="climateWindChart"></canvas>
+        </div>
+
+        <!-- 新增兩個表格容器（比照 chart-container 樣式） -->
+        <div class="chart-container" style="height: auto; min-height: 280px; padding: 15px 10px;">
+            <h3 style="margin: 0 0 12px;">日累積降水量極值 (mm) ☔</h3>
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse; font-size: 0.88em; line-height: 1.4;">
+                    <thead>
+                        <tr style="background: #2980b9; color: white;">
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">排序</th>
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">降水量(mm)</th>
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">日期</th>
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">天氣系統</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #fffaf0;">
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center; font-weight:bold;">1</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">1408.0</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2024/10/03</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">山陀兒颱風</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">351.3</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">1980/09/23</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">熱帶性低氣壓外圍環流</td>
+                        </tr>
+                        <tr style="background: #fffaf0;">
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">3</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">345.5</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2010/09/24</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">鋒面</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">4</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">337.6</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2017/06/02</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">梅雨鋒面</td>
+                        </tr>
+                        <tr style="background: #fffaf0;">
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">5</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">323.5</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">1968/09/30</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">艾琳颱風</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="chart-container" style="height: auto; min-height: 280px; padding: 15px 10px;">
+            <h3 style="margin: 0 0 12px;">海警期間累積降水量極值 (mm) 🌊</h3>
+            <div style="overflow-x: auto;">
+                <table style="width:100%; border-collapse: collapse; font-size: 0.88em; line-height: 1.4;">
+                    <thead>
+                        <tr style="background: #2980b9; color: white;">
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">排序</th>
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">降水量(mm)</th>
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">起迄日期</th>
+                            <th style="padding:8px 6px; border:1px solid #ccc; text-align:center;">颱風名稱</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #fffaf0;">
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center; font-weight:bold;">1</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">856.8</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">1987/10/22 ~ 10/27</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">琳恩颱風</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">760.0</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2024/09/29 ~ 10/04</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">山陀兒颱風</td>
+                        </tr>
+                        <tr style="background: #fffaf0;">
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">3</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">656.5</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">1998/10/25 ~ 10/27</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">芭比絲颱風</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">4</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">619.1</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2000/10/30 ~ 11/01</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">象神颱風</td>
+                        </tr>
+                        <tr style="background: #fffaf0;">
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">5</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">577.0</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd; text-align:center;">2001/09/13 ~ 09/19</td>
+                            <td style="padding:8px 6px; border:1px solid #ddd;">納莉颱風</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <p style="text-align: center; font-size: 0.85em; color: #666; margin-top: 20px;">
+        * 統計期間為 1991年至 2020年之 30 年平均值，風速統計期間為 1950年至 2022年。<br>
+    </p>
+</div>
+    <!-- 第 7 頁面：氣象站圖卡 -->
+    <div id="keelungCard" class="tab-content">
+        <div class="image-grid">
+            <div class="image-container">
+                <h3>圖卡1</h3>
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image1.png" alt="圖卡1">
+            </div>
+            <div class="image-container">
+                <h3>圖卡2</h3>
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image2.png" alt="圖卡2">
+            </div>
+            <div class="image-container">
+                <h3>圖卡3</h3>
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image3.jpg" alt="圖卡3">
+            </div>
+            <div class="image-container">
+                <h3>圖卡4</h3>
+                <img src="https://keelungcwa.github.io/keelungcwa/images/image4.jpg" alt="圖卡4">
+            </div>
+        </div>
+    </div>
+    <!-- 關於本網站 -->
+    <div id="aboutKeelung" class="tab-content">
+        <h3>關於本網站</h3>
+        <p>本網站專注於<strong>基隆北海岸的海氣象資訊</strong>，致力於提供<strong>簡易清晰、便民實用</strong>的內容，供機關與民眾參考。精選來自各單位的重要氣象產品，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸最值得信賴的山海氣象好厝邊。</p>
+        <p>請注意，<strong>部分產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並<strong>以本署官方預報為準</strong>，以確保資訊的準確性與可靠性。</p>
+        <p><strong>作者：基隆氣象站 鄧乃誠</strong></p>
+    </div>
+    <!-- 相關網站 -->
+    <div id="relatedLinks" class="tab-content">
+        <h3>相關網站</h3>
+        <p>以下為與基隆氣象站相關的網站連結，提供更多氣象資訊與服務：</p>
+        <ul>
+            <li><a href="https://keelungcwa.github.io/CWA_Waverisk/" target="_blank">基隆北海岸沿海與異常波浪(瘋狗浪)預報</a></li>
+            <li><a href="https://keelungcwa.github.io/marine_moniter/" target="_blank">臺灣即時海象監測</a></li>
+            <li><a href="https://codis.cwa.gov.tw/" target="_blank">CODiS 氣候觀測資料查詢服務 | 交通部中央氣象署</a></li>
+            <li><a href="https://hdps.cwa.gov.tw/hdps/" target="_blank">資料申購 | 交通部中央氣象署</a></li>
+            <li><a href="https://www.cwa.gov.tw/V8/C/A/organ/46694.html" target="_blank">基隆氣象站 | 交通部中央氣象署</a></li>
+            <li><a href="https://watch.ncdr.nat.gov.tw/watch_page_typhoon_v2" target="_blank">颱風監測 | NCDR國家災害防救科技中心</a></li>
+            <li><a href="https://wwtf.twport.com.tw/twport/display/Realtime_Panel_Port_2024.html?1" target="_blank">基隆港-海氣象資訊 | 商港海氣象資訊系統</a></li>
+            <li><a href="https://keelungcwa.github.io/CWA_WeatherStation_SOP/" target="_blank">氣象站轉型監測預報席作業SOP - 異常狀況處理互動決策樹</a></li>
+        </ul>
+    </div>
+    <!-- 底部資訊 -->
+    <footer>
+        <p>| <a id="aboutLink" href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a> |
+           <span class="social-icons">
+               <a href="https://www.facebook.com/KeelungWeatherStation" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+               <a href="https://maps.app.goo.gl/KTwwkkC9LxZeFJhF8" target="_blank" title="Google Maps"><i class="fas fa-map-marker-alt"></i></a>
+               <a href="https://www.instagram.com/cwa_weather/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+               <a href="https://www.youtube.com/@cwbwebtv" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+           </span> |
+        </p>
+        <p>| 服務時間：09:00至17:00 地址：200基隆市仁愛區港西街6號6樓 (海港大樓)</p>
+        <p>| 電話：(02)2422-4240 | 電子郵件：<a href="mailto:keelung@cwa.gov.tw">keelung@cwa.gov.tw</a></p>
+        <p>| 中央氣象署基隆氣象站 版權所有 轉載請註明出處</p>
+    </footer>
+    <!-- 結構化數據（Schema.org） -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "基隆氣象站 山海好厝邊",
+        "url": "https://keelungcwa.github.io/",
+        "description": "即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。由基隆氣象站開發、整合之簡易版網站。",
+        "publisher": {
+            "@type": "Organization",
+            "name": "中央氣象署基隆氣象站",
+            "url": "https://www.cwa.gov.tw/"
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://keelungcwa.github.io/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <script>
+        // 動態生成星星
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 1.5 + 1.5}s`;
+                star.innerHTML = '★';
+                starsContainer.appendChild(star);
+            }
+        }
+        const canvas = document.getElementById('rainCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const rainDrops = [];
+        const lightnings = [];
+        let animationFrame = null;
+        function RainDrop() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * -canvas.height;
+            this.length = Math.random() * 15 + 8;
+            this.speed = Math.random() * 4 + 4;
+        }
+        RainDrop.prototype.update = function() {
+            this.y += this.speed;
+            if (this.y > canvas.height) {
+                this.y = -this.length;
+                this.x = Math.random() * canvas.width;
+            }
+        };
+        RainDrop.prototype.draw = function(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x, this.y + this.length);
+            ctx.strokeStyle = 'rgba(174, 194, 224, 0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        };
+        function Lightning() {
+            this.mainPath = [];
+            this.branches = [];
+            this.opacity = 0;
+            this.lifetime = 0;
+            this.generate();
+        }
+        Lightning.prototype.generate = function() {
+            this.mainPath = [];
+            const startX = Math.random() * canvas.width * 0.4 + canvas.width * 0.3;
+            const startY = 0;
+            let currentX = startX;
+            let currentY = 0;
+            this.mainPath.push({ x: currentX, y: currentY });
+            const segments = 8;
+            for (let i = 0; i < segments; i++) {
+                currentX += (Math.random() - 0.5) * 50;
+                currentY += canvas.height / segments;
+                this.mainPath.push({ x: currentX, y: currentY });
+            }
+            this.branches = [];
+            const branchCount = Math.floor(Math.random() * 3) + 1;
+            for (let i = 0; i < branchCount; i++) {
+                const segmentIndex = Math.floor(Math.random() * 3) + 2;
+                const startPoint = this.mainPath[segmentIndex];
+                const branch = [];
+                let bx = startPoint.x;
+                let by = startPoint.y;
+                branch.push({ x: bx, y: by });
+                const branchLength = Math.random() * 0.2 * canvas.height + 0.2 * canvas.height;
+                const angle = (Math.random() > 0.5 ? 1 : -1) * (Math.PI / 6 + Math.random() * Math.PI / 6);
+                for (let j = 0; j < 3; j++) {
+                    bx += Math.cos(angle) * (branchLength / 3);
+                    by += Math.sin(angle) * (branchLength / 3);
+                    branch.push({ x: bx, y: by });
+                }
+                this.branches.push(branch);
+            }
+            this.opacity = 0.9;
+            this.lifetime = 0.1;
+        };
+        Lightning.prototype.update = function(dt) {
+            if (this.lifetime > 0) {
+                this.lifetime -= dt;
+                this.opacity = this.lifetime > 0 ? 0.9 : 0;
+            }
+        };
+        Lightning.prototype.draw = function(ctx) {
+            if (this.opacity <= 0) return;
+            ctx.beginPath();
+            ctx.moveTo(this.mainPath[0].x, this.mainPath[0].y);
+            for (let i = 1; i < this.mainPath.length; i++) {
+                ctx.lineTo(this.mainPath[i].x, this.mainPath[i].y);
+            }
+            ctx.strokeStyle = `rgba(255, 255, 0, ${this.opacity})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            this.branches.forEach(branch => {
+                ctx.beginPath();
+                ctx.moveTo(branch[0].x, branch[0].y);
+                for (let i = 1; i < branch.length; i++) {
+                    ctx.lineTo(branch[i].x, branch[i].y);
+                }
+                ctx.strokeStyle = `rgba(255, 255, 0, ${this.opacity})`;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            });
+        };
+        function startAnimation(isThunder) {
+            if (rainDrops.length === 0 && (isThunder || document.body.classList.contains('rainy'))) {
+                for (let i = 0; i < 80; i++) {
+                    rainDrops.push(new RainDrop());
+                }
+            }
+            let lastTime = performance.now();
+            let lightningTimer = 0;
+            const lightningInterval = Math.random() * 3000 + 2000;
+            function animate() {
+                const currentTime = performance.now();
+                const dt = (currentTime - lastTime) / 1000;
+                lastTime = currentTime;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (document.body.classList.contains('rainy') || document.body.classList.contains('thunder')) {
+                    rainDrops.forEach(drop => {
+                        drop.update();
+                        drop.draw(ctx);
+                    });
+                }
+                if (isThunder && document.body.classList.contains('thunder')) {
+                    lightningTimer += dt * 1000;
+                    if (lightningTimer > lightningInterval) {
+                        lightnings.push(new Lightning());
+                        lightningTimer = 0;
+                    }
+                    lightnings.forEach((lightning, index) => {
+                        lightning.update(dt);
+                        lightning.draw(ctx);
+                        if (lightning.lifetime <= 0) {
+                            lightnings.splice(index, 1);
+                        }
+                    });
+                }
+                animationFrame = requestAnimationFrame(animate);
+            }
+            if (!animationFrame) {
+                animate();
+            }
+        }
+        function stopAnimation() {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+                animationFrame = null;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            rainDrops.length = 0;
+            lightnings.length = 0;
+        }
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        let tempChart, humidityChart, windSpeedChart, precipitationChart;
+        let mapInstance = null;
+        let allData = {};
+        let visibleStations = ['基隆', '淡水', '七堵', '富貴角', '大坪', '鼻頭角', '三貂角', '瑞芳', '汐止'];
+        const allStations = [
+            '基隆', '淡水', '七堵', '大武崙', '野柳', '淡水觀海', '石門', '水湳洞', '八斗子', '六塊厝', '田寮',
+            '大坪', '基隆嶼', '白沙灣', '三貂角', '鼻頭角', '澳底', '泰平', '雙溪', '汐止', '暖暖',
+            '富貴角', '福隆', '彭佳嶼', '金山', '三和', '瑞芳', '五分山', '國一S001K', '國一S006K', '國三S004K',
+            '國三S007K', '國三N002K'
+        ];
+        const colors = [
+            'rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)',
+            'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(0, 128, 0)', 'rgb(255, 99, 71)',
+            'rgb(144, 238, 144)', 'rgb(173, 216, 230)'
+        ];
+        const stations = {
+            '基隆': [25.133314, 121.740475], '淡水': [25.164889, 121.448906], '七堵': [25.094819, 121.71713],
+            '大武崙': [25.166676, 121.706993], '野柳': [25.20703, 121.690021], '淡水觀海': [25.184591, 121.408616],
+            '石門': [25.273672, 121.601198], '水湳洞': [25.123695, 121.862238], '八斗子': [25.144754, 121.79167],
+            '六塊厝': [25.24, 121.4481], '田寮': [25.2698, 121.4886], '大坪': [25.165914, 121.632969],
+            '基隆嶼': [25.19141, 121.78391], '白沙灣': [25.283128, 121.519058], '三貂角': [25.007606, 122.002058],
+            '鼻頭角': [25.129036, 121.923372], '澳底': [25.0552, 121.9253], '泰平': [24.971197, 121.823711],
+            '雙溪': [25.036003, 121.864242], '汐止': [25.066881, 121.658778], '暖暖': [25.0957, 121.7403],
+            '富貴角': [25.2900, 121.5361], '福隆': [25.0200, 121.9389], '彭佳嶼': [25.627975, 122.079744],
+            '金山': [25.223628, 121.643967], '三和': [25.233153, 121.595236], '瑞芳': [25.1086, 121.8111],
+            '五分山': [25.071182, 121.781205]
+        };
+        function getWeatherEmoji(weather, hours) {
+            if (weather === '晴') {
+                return (hours >= 18 || hours < 6) ? '🌙' : '☀️';
+            }
+            if (weather.includes('雷')) return '⛈️';
+            if (weather.includes('雨')) return '🌧️';
+            if (weather.includes('霧') || weather.includes('靄') || weather.includes('霾')) return '🌫️';
+            if (weather.includes('多雲')) return '🌥️';
+            if (weather.includes('陰')) return '☁️';
+            return '❓';
+        }
+        function showToast(message) {
+            let toast = document.querySelector('.toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.className = 'toast';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        function updateLatestWeather() {
+            const keelungData = allData['基隆'];
+            if (!keelungData || keelungData.length === 0) {
+                document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
+                document.body.className = 'cloudy';
+                stopAnimation();
+                showToast('暫無基隆天氣資料，請稍後重試');
+                return;
+            }
+            const latestData = keelungData.sort((a, b) => b.Time - a.Time)[0];
+            const date = latestData.Time;
+            const hours = date.getHours();
+            const weather = latestData.Weather || '未知';
+            const temperature = latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A';
+            const humidity = latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A';
+            const precipitation = latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A';
+            const windSpeed = latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A';
+            const timeStr = `${hours.toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+           
+            let displayWeather = weather;
+            if (weather === '晴') {
+                displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+            }
+            const weatherEmoji = getWeatherEmoji(weather, hours);
+           
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}年${(now.getMonth() + 1).toString().padStart(2, '0')}月${now.getDate().toString().padStart(2, '0')}日 (${weekdays[now.getDay()]})`;
+            document.getElementById('latestWeather').innerHTML =
+                `${dateStr} ${displayWeather} ${weatherEmoji} 氣溫 ${temperature}°C 濕度 ${humidity}% 雨量 ${precipitation}mm 風速 ${windSpeed}m/s (${timeStr})`;
+           
+            const weatherClass = weather.includes('雷') ? 'thunder' :
+                                weather.includes('雨') ? 'rainy' :
+                                weather === '晴' && (hours >= 18 || hours < 6) ? 'night' :
+                                weather === '晴' ? 'sunny' :
+                                weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
+                                weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
+            document.body.className = weatherClass;
+            stopAnimation();
+            if (weatherClass === 'thunder') {
+                startAnimation(true);
+            } else if (weatherClass === 'rainy') {
+                startAnimation(false);
+            }
+        }
+        function showTab(tabId) {
+            try {
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                const tabElement = document.querySelector(`.tab[data-tab="${tabId}"]`);
+                const contentElement = document.getElementById(tabId);
+                if (!contentElement) {
+                    console.error(`Content not found for ID: ${tabId}`);
+                    showToast('無法載入分頁內容，請稍後重試');
+                    return;
+                }
+                if (tabElement) tabElement.classList.add('active');
+                contentElement.classList.add('active');
+                if (tabId === 'charts') {
+                    setTimeout(() => {
+                        if (mapInstance) {
+                            mapInstance.invalidateSize();
+                        } else {
+                            initMap();
+                        }
+                    }, 100);
+                }
+                if (tabId === 'climate') {
+                    setTimeout(initClimateCharts, 200);
+                }
+            } catch (error) {
+                console.error('Error in showTab:', error);
+                showToast('切換分頁失敗，請稍後重試');
+            }
+        }
+        function updateWaveGif() {
+            const now = new Date();
+            const baseUrl = 'https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/';
+            const targetTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const year = targetTime.getFullYear();
+            const month = String(targetTime.getMonth() + 1).padStart(2, '0');
+            const day = String(targetTime.getDate()).padStart(2, '0');
+            const hours = targetTime.getHours();
+            const closestHour = String(Math.floor(hours / 6) * 6).padStart(2, '0');
+            const timeString = `${year}${month}${day}${closestHour}`;
+            document.getElementById('waveGif').src = `${baseUrl}${year}${month}/${timeString}/${timeString}.gif`;
+        }
+        function loadAndPlotData() {
+            fetch('data/keelung_data.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('無法載入 JSON 資料');
+                    return response.json();
+                })
+                .then(data => {
+                    allData = {};
+                    data.forEach((row, index) => {
+                        const stationName = row.station_name;
+                        if (allStations.includes(stationName)) {
+                            if (!allData[stationName]) allData[stationName] = [];
+                            const time = new Date(row.time);
+                            if (isNaN(time.getTime())) {
+                                console.warn(`無法解析時間，第 ${index} 行，站點 ${stationName}，時間值: ${row.time}`);
+                            } else {
+                                allData[stationName].push({
+                                    Time: time,
+                                    AirTemperature: row.weather_elements.AirTemperature != null && row.weather_elements.AirTemperature !== -99 && row.weather_elements.AirTemperature >= -10 && row.weather_elements.AirTemperature <= 50 ? parseFloat(row.weather_elements.AirTemperature) : null,
+                                    RelativeHumidity: row.weather_elements.RelativeHumidity != null ? parseFloat(row.weather_elements.RelativeHumidity) : null,
+                                    WindSpeed: row.weather_elements.WindSpeed != null ? parseFloat(row.weather_elements.WindSpeed) : null,
+                                    Precipitation: row.weather_elements.Precipitation != null && parseFloat(row.weather_elements.Precipitation) >= 0 ? parseFloat(row.weather_elements.Precipitation) : null,
+                                    Weather: row.weather_elements.Weather || '未知'
+                                });
+                            }
+                        }
+                    });
+                    updateLatestWeather();
+                    updateRankingTable('maxTemperature');
+                    initMap();
+                    const now = new Date();
+                    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                    plotCharts(twentyFourHoursAgo, now);
+                })
+                .catch(error => {
+                    console.error('載入 JSON 資料失敗:', error);
+                    document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
+                    document.getElementById('rankingTable').querySelector('tbody').innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
+                    document.getElementById('map').innerHTML = '<p style="text-align: center; color: #666;">暫無地圖資料</p>';
+                    stopAnimation();
+                    showToast('載入 JSON 資料失敗，請稍後重試');
+                });
+            updateWaveGif();
+            setInterval(updateWaveGif, 6 * 60 * 60 * 1000);
+        }
+        function updateRankingTable(sortType = 'maxTemperature') {
+            const tableBody = document.getElementById('rankingTable').querySelector('tbody');
+            tableBody.innerHTML = '';
+            document.querySelectorAll('.ranking-buttons button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(sortType === 'maxTemperature' ? '最高溫' : sortType === 'minTemperature' ? '最低溫' : sortType === 'windSpeed' ? '風速' : '雨量')) {
+                    btn.classList.add('active');
+                }
+            });
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+            const todayRanking = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const todayData = allData[station].filter(d => d.Time >= today && d.Time < tomorrow);
+                    if (todayData.length > 0) {
+                        const value = sortType === 'maxTemperature' ? Math.max(...todayData.map(d => d.AirTemperature).filter(v => v != null)) :
+                                      sortType === 'minTemperature' ? Math.min(...todayData.map(d => d.AirTemperature).filter(v => v != null)) :
+                                      sortType === 'windSpeed' ? Math.max(...todayData.map(d => d.WindSpeed).filter(v => v != null)) :
+                                      Math.max(...todayData.map(d => d.Precipitation).filter(v => v != null && v >= 0));
+                        const dataPoint = todayData.find(d =>
+                            (sortType === 'maxTemperature' && d.AirTemperature === value) ||
+                            (sortType === 'minTemperature' && d.AirTemperature === value) ||
+                            (sortType === 'windSpeed' && d.WindSpeed === value) ||
+                            (sortType === 'precipitation' && d.Precipitation === value)
+                        );
+                        if (value != null && !isNaN(value) && dataPoint) {
+                            todayRanking.push({
+                                station,
+                                value,
+                                time: dataPoint.Time
+                            });
+                        }
+                    }
+                }
+            });
+            const nowRanking = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const latestData = allData[station].sort((a, b) => b.Time - a.Time)[0];
+                    const value = sortType === 'maxTemperature' ? latestData.AirTemperature :
+                                  sortType === 'minTemperature' ? latestData.AirTemperature :
+                                  sortType === 'windSpeed' ? latestData.WindSpeed :
+                                  latestData.Precipitation;
+                    if (value != null && (sortType !== 'precipitation' || value >= 0)) {
+                        nowRanking.push({
+                            station,
+                            value,
+                            time: latestData.Time
+                        });
+                    }
+                }
+            });
+            const sortedTodayRanking = todayRanking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5);
+            const sortedNowRanking = nowRanking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5);
+            for (let i = 0; i < 5; i++) {
+                const todayItem = sortedTodayRanking[i] || {};
+                const nowItem = sortedNowRanking[i] || {};
+                const todayTimeStr = todayItem.time ? `${todayItem.time.getHours().toString().padStart(2, '0')}:${todayItem.time.getMinutes().toString().padStart(2, '0')}` : '-';
+                const nowTimeStr = nowItem.time ? `${nowItem.time.getHours().toString().padStart(2, '0')}:${nowItem.time.getMinutes().toString().padStart(2, '0')}` : '-';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${todayItem.station || '-'}</td>
+                    <td>${todayItem.value != null ? todayItem.value.toFixed(1) : '-'}</td>
+                    <td>${todayTimeStr}</td>
+                    <td>${i + 1}</td>
+                    <td>${nowItem.station || '-'}</td>
+                    <td>${nowItem.value != null ? nowItem.value.toFixed(1) : '-'}</td>
+                    <td>${nowTimeStr}</td>
+                `;
+                tableBody.appendChild(row);
+            }
+            if (tableBody.innerHTML === '') {
+                tableBody.innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
+            }
+        }
+        function plotCharts(twentyFourHoursAgo, now) {
+            const allTimes = Object.values(allData).flat().map(d => d.Time.getTime());
+            const uniqueTimes = [...new Set(allTimes)].filter(t => !isNaN(t));
+            const chartType = uniqueTimes.length > 1 ? 'line' : 'bar';
+            const datasets = {
+                temperature: [], humidity: [], windSpeed: [], precipitation: []
+            };
+            visibleStations.forEach((station, index) => {
+                if (allData[station] && allData[station].length > 0) {
+                    const stationData = allData[station];
+                    datasets.temperature.push({
+                        label: station,
+                        data: stationData.map(item => ({ x: item.Time, y: item.AirTemperature })),
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
+                        tension: 0.1,
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 1.5
+                    });
+                    datasets.humidity.push({
+                        label: station,
+                        data: stationData.map(item => ({ x: item.Time, y: item.RelativeHumidity })),
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
+                        tension: 0.1,
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 1.5
+                    });
+                    datasets.windSpeed.push({
+                        label: station,
+                        data: stationData.map(item => ({ x: item.Time, y: item.WindSpeed })),
+                        borderColor: colors[index % colors.length],
+                        backgroundColor: chartType === 'bar' ? colors[index % colors.length] : undefined,
+                        tension: 0.1,
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 1.5
+                    });
+                }
+            });
+            const latestPrecipitation = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const stationData = allData[station];
+                    const latestData = stationData.sort((a, b) => b.Time - a.Time)[0];
+                    const precipitation = latestData.Precipitation || 0;
+                    let backgroundColor = 'rgb(54, 162, 235)';
+                    if (precipitation > 200) backgroundColor = 'rgb(255, 99, 132)';
+                    else if (precipitation > 80) backgroundColor = 'rgb(255, 165, 0)';
+                    else if (precipitation > 40) backgroundColor = 'rgb(255, 215, 0)';
+                    latestPrecipitation.push({ station, value: precipitation, color: backgroundColor });
+                }
+            });
+            latestPrecipitation.sort((a, b) => b.value - a.value);
+            const top15Precipitation = latestPrecipitation.slice(0, 15);
+            datasets.precipitation = top15Precipitation.map(item => ({
+                label: item.station,
+                data: [{ x: item.station, y: item.value }],
+                backgroundColor: item.color,
+                borderColor: item.color,
+                borderWidth: 3
+            }));
+            if (tempChart) tempChart.destroy();
+            if (humidityChart) humidityChart.destroy();
+            if (windSpeedChart) windSpeedChart.destroy();
+            if (precipitationChart) precipitationChart.destroy();
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: { enabled: true },
+                    legend: { position: 'right', labels: { font: { size: 10 }, pointStyle: 'circle' } }
+                }
+            };
+            tempChart = new Chart(document.getElementById('temperatureChart'), {
+                type: chartType,
+                data: { datasets: datasets.temperature },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
+                            title: { display: true, text: '時間', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            min: twentyFourHoursAgo,
+                            max: now,
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        },
+                        y: {
+                            title: { display: true, text: '溫度 (°C) 🌡️', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            ticks: {
+                                font: { size: window.innerWidth > 768 ? 12 : 10 },
+                                stepSize: 2
+                            },
+                        }
+                    }
+                }
+            });
+            humidityChart = new Chart(document.getElementById('humidityChart'), {
+                type: chartType,
+                data: { datasets: datasets.humidity },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
+                            title: { display: true, text: '時間', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            min: twentyFourHoursAgo,
+                            max: now,
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        },
+                        y: {
+                            title: { display: true, text: '相對濕度 (%) 💧', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            min: 20,
+                            max: 100,
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        }
+                    }
+                }
+            });
+            windSpeedChart = new Chart(document.getElementById('windSpeedChart'), {
+                type: chartType,
+                data: { datasets: datasets.windSpeed },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } },
+                            title: { display: true, text: '時間', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            min: twentyFourHoursAgo,
+                            max: now,
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        },
+                        y: {
+                            title: { display: true, text: '風速 (m/s) 💨', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            min: 0,
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        }
+                    }
+                }
+            });
+            precipitationChart = new Chart(document.getElementById('precipitationChart'), {
+                type: chartType,
+                data: { datasets: datasets.precipitation },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            title: { display: true, text: '站點', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        },
+                        y: {
+                            title: { display: true, text: '最新雨量 (mm) 🌧️', font: { size: window.innerWidth > 768 ? 14 : 12 } },
+                            min: 0,
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        }
+                    }
+                }
+            });
+        }
+        function initMap() {
+            if (mapInstance) {
+                mapInstance.remove();
+            }
+            mapInstance = L.map('map').setView([25.128, 121.742], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(mapInstance);
+            const bounds = mapInstance.getBounds();
+            const zoomLevel = mapInstance.getZoom();
+            const baseZoom = 10;
+            const scaleFactor = zoomLevel / baseZoom;
+            const markerSize = 30;
+            const fontSize = 20;
+            const anchorY = 30 * scaleFactor;
+            for (let [name, [lat, lng]] of Object.entries(stations)) {
+                if (allStations.includes(name)) {
+                    let markerIcon;
+                    const stationData = allData[name];
+                    let popupContent = `<b>${name}</b><br>無數據`;
+                    if (stationData && stationData.length > 0) {
+                        const latestData = stationData.sort((a, b) => b.Time - a.Time)[0];
+                        const weather = latestData.Weather || '未知';
+                        const hours = latestData.Time.getHours();
+                        let displayWeather = weather;
+                        if (weather === '晴') {
+                            displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+                        }
+                        const emoji = getWeatherEmoji(weather, hours);
+                        const timeStr = `${latestData.Time.getHours().toString().padStart(2, '0')}:${latestData.Time.getMinutes().toString().padStart(2, '0')}`;
+                        const isVisible = visibleStations.includes(name);
+                        popupContent = `
+                            <b>${name}</b><br>
+                            天氣: ${displayWeather} <span style="${isVisible ? 'background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;' : ''}">${emoji}</span><br>
+                            氣溫: ${latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A'} °C<br>
+                            濕度: ${latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A'} %<br>
+                            風速: ${latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A'} m/s<br>
+                            雨量: ${latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A'} mm<br>
+                            更新時間: ${timeStr}
+                        `;
+                        markerIcon = L.divIcon({
+                            className: 'custom-marker',
+                            html: `
+                                <div style="
+                                    font-size: ${fontSize}px;
+                                    transform: translate(-50%, -${anchorY}px);
+                                    ${isVisible ? 'background: rgba(255, 255, 255, 0.7); border-radius: 50%; padding: 2px;' : ''}">
+                                    ${emoji}
+                                </div>`,
+                            iconSize: [markerSize, markerSize],
+                            iconAnchor: [markerSize / 2, anchorY]
+                        });
+                    } else {
+                        markerIcon = L.divIcon({
+                            className: 'custom-marker',
+                            html: `<div style="width: 12px; height: 12px; background-color: #808080; border-radius: 50%; transform: translate(-50%, -50%);"></div>`,
+                            iconSize: [12, 12],
+                            iconAnchor: [6, 6]
+                        });
+                    }
+                    L.marker([lat, lng], { icon: markerIcon })
+                        .addTo(mapInstance)
+                        .bindPopup(popupContent)
+                        .on('click', () => toggleStation(name));
+                }
+            }
+            setTimeout(() => {
+                mapInstance.invalidateSize();
+            }, 100);
+        }
+        function toggleStation(station) {
+            try {
+                if (visibleStations.includes(station)) {
+                    visibleStations = visibleStations.filter(s => s !== station);
+                    showToast(`已移除測站：${station}`);
+                } else {
+                    visibleStations.push(station);
+                    showToast(`已添加測站：${station}`);
+                }
+                const now = new Date();
+                const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                plotCharts(twentyFourHoursAgo, now);
+                initMap();
+            } catch (error) {
+                console.error('切換站點失敗:', error);
+                showToast('切換測站失敗，請稍後重試');
+            }
+        }
+        // --- 基隆氣候統計 (修正 X 軸顯示、雨量圖前後補空值、加大邊距) ---
+        const climateMonths = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+        const climateStats = {
+            temp: {
+                max: [18.4, 19.1, 21.0, 24.7, 28.0, 31.2, 33.3, 32.5, 29.8, 26.1, 23.6, 20.1],
+                avg: [16.1, 16.4, 18.1, 21.6, 24.8, 27.6, 29.5, 29.1, 27.2, 24.2, 21.5, 18.0],
+                min: [14.2, 14.3, 15.7, 19.0, 22.3, 25.0, 26.7, 26.5, 25.0, 22.4, 19.6, 16.1]
+            },
+            rain: [327.8, 349.8, 274.4, 211.1, 284.1, 290.4, 119.5, 211.4, 390.1, 377.6, 396.9, 356.6],
+            sunshine: [52.6, 57.9, 80.6, 91.2, 111.9, 138.4, 229.2, 208.2, 147.4, 85.7, 65.3, 48.5],
+            rainDays: [19.6, 17.9, 18.7, 16.0, 16.1, 14.8, 8.5, 11.6, 15.2, 17.1, 18.6, 19.5],
+            wind: {
+                avgMax: [23.0, 22.3, 20.0, 17.6, 18.3, 19.5, 36.3, 43.0, 35.0, 31.5, 25.8, 16.0],
+                gustMax: [31.8, 28.0, 29.0, 26.8, 30.0, 33.9, 59.5, 54.0, 67.0, 49.6, 36.7, 28.5]
+            }
+        };
+        let climateChartsInitialized = false;
+        function initClimateCharts() {
+            if (climateChartsInitialized) return;
+            // 共用選項：加大左側空間、調整格線、圖例在上方
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 20,    // 增加左側 padding，避免 Y 軸標籤擠壓 X 軸
+                        right: 15,
+                        top: 10,
+                        bottom: 20   // 底部多一點空間給 X 軸標籤
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { display: false },
+                        ticks: {
+                            autoSkip: false,
+                            font: { size: window.innerWidth > 768 ? 13 : 11 },
+                            padding: 10
+                        }
+                    },
+                    y: {
+                        display: true,
+                        grid: { 
+                            display: true,
+                            drawOnChartArea: true,   // 只畫邊框線，不畫穿過圖表的格線
+                            drawTicks: true
+                        },
+                        ticks: {
+                            font: { size: window.innerWidth > 768 ? 12 : 10 },
+                            padding: 12
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { 
+                            boxWidth: 12, 
+                            font: { size: window.innerWidth > 768 ? 13 : 11 },
+                            padding: 15
+                        }
+                    }
+                }
+            };
+            // 1. 氣溫 (折線圖)
+            new Chart(document.getElementById('climateTempChart'), {
+                type: 'line',
+                data: {
+                    labels: climateMonths,
+                    datasets: [
+                        { label: '最高', data: climateStats.temp.max, borderColor: '#e74c3c', tension: 0.3 },
+                        { label: '平均', data: climateStats.temp.avg, borderColor: '#2ecc71', tension: 0.3 },
+                        { label: '最低', data: climateStats.temp.min, borderColor: '#3498db', tension: 0.3 }
+                    ]
+                },
+                options: commonOptions
+            });
+            // 2. 降雨量 (長條圖)
+            new Chart(document.getElementById('climateRainChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['', ...climateMonths, ''],  // 前後各加一個空標籤
+                    datasets: [{
+                        label: '雨量(mm)',
+                        data: [null, ...climateStats.rain, null],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgba(52, 152, 219, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        categoryPercentage: 0.9
+                    }]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        x: {
+                            ...commonOptions.scales.x,
+                            ticks: {
+                                ...commonOptions.scales.x.ticks,
+                                callback: function(value, index) {
+                                    // 只顯示 1~12 月，其他隱藏
+                                    return (index >= 1 && index <= 12) ? climateMonths[index-1] : '';
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'mm', font: { size: 13 } },
+                            ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }  // 單一資料集，隱藏圖例
+                    }
+                }
+            });
+            // 3. 日照與雨日 
+            new Chart(document.getElementById('climateSunRainChart'), {
+                type: 'line',
+                data: {
+                    labels: climateMonths,
+                    datasets: [
+                        { 
+                            label: '日照時數 (小時)', 
+                            data: climateStats.sunshine, 
+                            borderColor: '#f1c40f', 
+                            tension: 0.3,
+                            yAxisID: 'y' 
+                        },
+                        { 
+                            label: '雨日 (天)', 
+                            data: climateStats.rainDays, 
+                            borderColor: '#95a5a6', 
+                            tension: 0.3,
+                            yAxisID: 'y1' 
+                        }
+                    ]
+                },
+                options: {
+                    ...commonOptions,
+                    scales: {
+                        x: commonOptions.scales.x,
+                        y: { 
+                            type: 'linear', 
+                            position: 'left', 
+                            title: { display: true, text: '小時', font: { size: 13 } }, 
+                            grid: { drawOnChartArea: false }
+                        },
+                        y1: { 
+                            type: 'linear', 
+                            position: 'right', 
+                            title: { display: true, text: '天數', font: { size: 13 } }, 
+                            grid: { drawOnChartArea: true }
+                        }
+                    }
+                }
+            });
+            // 4. 風速 (折線圖)
+            new Chart(document.getElementById('climateWindChart'), {
+                type: 'line',
+                data: {
+                    labels: climateMonths,
+                    datasets: [
+                        { label: '平均最大風速', data: climateStats.wind.avgMax, borderColor: '#9b59b6', borderDash: [5,5], tension: 0.3 },
+                        { label: '瞬間最大陣風', data: climateStats.wind.gustMax, borderColor: '#e67e22', borderWidth: 2, tension: 0.3 }
+                    ]
+                },
+                options: commonOptions
+            });
+            climateChartsInitialized = true;
+        }
+        let isInitialized = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isInitialized) {
+                console.warn('Initialization already performed, skipping.');
+                return;
+            }
+            isInitialized = true;
+            console.log('Initializing page...');
+            createStars();
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    showTab(tabId);
+                });
+            });
+            const aboutLink = document.getElementById('aboutLink');
+            if (aboutLink) {
+                aboutLink.addEventListener('click', () => {
+                    console.log('About link clicked');
+                    showTab('aboutKeelung');
+                });
+            } else {
+                console.error('About link not found');
+                showToast('無法載入「關於本網站」，請稍後重試');
+            }
+            const relatedLinks = document.getElementById('relatedLinks');
+            if (relatedLinks) {
+                relatedLinks.addEventListener('click', () => {
+                    console.log('Related links clicked');
+                    showTab('relatedLinks');
+                });
+            } else {
+                console.error('Related links not found');
+                showToast('無法載入「相關網站」，請稍後重試');
+            }
+            loadAndPlotData();
+            if (document.getElementById('charts').classList.contains('active')) {
+                initMap();
+            }
+        });
+    </script>
+</body>
+</html>
