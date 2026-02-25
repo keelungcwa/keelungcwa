@@ -1310,7 +1310,7 @@
                 }
             });
             precipitationChart = new Chart(document.getElementById('precipitationChart'), {
-                type: 'bar',
+                type: chartType,
                 data: { datasets: datasets.precipitation },
                 options: {
                     responsive: true,
@@ -1323,7 +1323,6 @@
                         },
                         y: {
                             title: { display: true, text: '累積雨量 (mm) 🌧️', font: { size: window.innerWidth > 768 ? 14 : 12 } },
-                            beginAtZero: true,
                             min: 0,
                             ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } }
                         }
@@ -1635,3 +1634,4 @@
     </script>
 </body>
 </html>
+
