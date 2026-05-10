@@ -270,13 +270,13 @@
         }
         /* Weather banner now lives inside the header */
         #latestWeather {
-            flex: 1;
+            flex: 0 1 58%;          /* max ~58% of header width, can shrink */
             min-width: 0;
-            padding: 7px 14px;
-            font-size: 0.82rem;
+            padding: 6px 10px;
+            font-size: 0.78rem;
             color: var(--ink-light);
             font-family: var(--font-mono);
-            letter-spacing: 0.01em;
+            letter-spacing: 0;      /* tight, no extra spacing */
             background: rgba(255,255,255,0.45);
             border: 1px solid var(--border);
             border-top: 2px solid var(--ocean-mid);
@@ -737,18 +737,21 @@
         .hamburger-btn.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
         .hamburger-btn.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* Mobile nav drawer */
+        /* Mobile nav drawer — overlay uses pointer-events to block clicks when hidden */
         .mobile-nav-overlay {
-            display: none;
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.35);
             z-index: 500;
             backdrop-filter: blur(2px);
             opacity: 0;
+            pointer-events: none;
             transition: opacity 0.25s ease;
         }
-        .mobile-nav-overlay.visible { opacity: 1; }
+        .mobile-nav-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
         .mobile-nav-drawer {
             position: fixed;
@@ -846,7 +849,7 @@
             .chart-grid { grid-template-columns: repeat(2, 1fr); }
             .chart-container, .ranking-container, #map { height: 280px; }
             .hamburger-btn { display: none !important; }
-            .mobile-nav-overlay, .mobile-nav-drawer { display: none !important; }
+            /* overlay/drawer hidden via opacity+pointer-events; no display:none needed */
         }
         @media (max-width: 768px) {
             .page-wrapper { padding: 12px 10px 0; }
@@ -1284,6 +1287,8 @@
         <div style="margin-bottom: 6px;">
             <a id="aboutLink" href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a>
             <span class="footer-divider">·</span>
+            <a href="https://evisit.cwa.gov.tw/reservation?unit_id=D011" target="_blank">預約參訪</a>
+            <span class="footer-divider">·</span>
             <span class="social-icons">
                 <a href="https://www.facebook.com/KeelungWeatherStation" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://maps.app.goo.gl/KTwwkkC9LxZeFJhF8" target="_blank" title="Google Maps"><i class="fas fa-map-marker-alt"></i></a>
@@ -1671,7 +1676,12 @@
             });
             latestPrecipitation.sort((a, b) => b.value - a.value);
             const top15 = latestPrecipitation.slice(0, 15);
-            datasets.precipitation = top15.map(item => ({ label: item.station, data: [{ x: item.station, y: item.value }], backgroundColor: item.color, borderColor: item.color, borderWidth: 3 }));
+            // Single dataset with labels array so bars fill the full chart width
+            datasets.precipitation = {
+                labels: top15.map(i => i.station),
+                data:   top15.map(i => i.value),
+                colors: top15.map(i => i.color)
+            };
 
             if (tempChart) tempChart.destroy();
             if (humidityChart) humidityChart.destroy();
@@ -1695,8 +1705,21 @@
                 options: { ...chartOptions, scales: { x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 12 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 10 } } }, y: { title: { display: true, text: '風速 (m/s)', font: { size: 12 } }, min: 0, ticks: { font: { size: 10 } } } } }
             });
             precipitationChart = new Chart(document.getElementById('precipitationChart'), {
-                type: 'bar', data: { datasets: datasets.precipitation },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: '站點', font: { size: 12 } }, ticks: { font: { size: 10 } } }, y: { title: { display: true, text: '累積雨量 (mm)', font: { size: 12 } }, beginAtZero: true, min: 0, ticks: { font: { size: 10 } } } } }
+                type: 'bar',
+                data: {
+                    labels: datasets.precipitation.labels,
+                    datasets: [{
+                        label: '累積雨量',
+                        data: datasets.precipitation.data,
+                        backgroundColor: datasets.precipitation.colors,
+                        borderColor: datasets.precipitation.colors,
+                        borderWidth: 1,
+                        borderRadius: 3,
+                        categoryPercentage: 0.85,
+                        barPercentage: 0.9
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: '站點', font: { size: 10 } }, ticks: { font: { size: 9 }, maxRotation: 45 } }, y: { title: { display: true, text: '累積雨量 (mm)', font: { size: 10 } }, beginAtZero: true, min: 0, ticks: { font: { size: 9 } } } } }
             });
         }
 
@@ -1851,7 +1874,7 @@
             const weekdays = ['日','一','二','三','四','五','六'];
             const now = new Date();
             const dateStr = `${now.getFullYear()}年${(now.getMonth()+1).toString().padStart(2,'0')}月${now.getDate().toString().padStart(2,'0')}日 (${weekdays[now.getDay()]})`;
-            const html = `${dateStr}　${displayWeather} ${weatherEmoji}　氣溫 ${temperature}°C　濕度 ${humidity}%　雨量 ${precipitation} mm　風速 ${windSpeed} m/s　(${timeStr})`;
+            const html = `${dateStr} ${displayWeather}${weatherEmoji} ${temperature}°C · 濕${humidity}% · 雨${precipitation}mm · 風${windSpeed}m/s (${timeStr})`;
             document.getElementById('latestWeather').innerHTML =
             document.getElementById('latestWeatherMobile').innerHTML = html;
             // Only change background if not manually overridden
