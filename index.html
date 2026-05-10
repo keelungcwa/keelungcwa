@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="基隆天氣, 基隆氣象站, 北海岸天氣, 基隆天氣預報, 海象圖資, 天氣圖資, 基隆雨量, 北海岸氣象, 基隆潮位, 中央氣象署, 中央氣象署基隆站, 天氣預報, 氣象資訊, 台灣天氣">
+    <meta name="author" content="基隆氣象站 鄧乃誠">
+    <meta name="robots" content="index, follow">
+    <title>基隆氣象站 山海好厝邊</title>
+    <link rel="icon" type="image/png" href="https://keelungcwa.github.io/keelungcwa/images/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D74WCKD2S0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-D74WCKD2S0');
+    </script>
+    <!-- Open Graph 設定 -->
+    <meta property="og:title" content="基隆氣象站 山海好厝邊">
+    <meta property="og:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta property="og:image" content="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png">
+    <meta property="og:url" content="https://keelungcwa.github.io/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="基隆氣象站 山海好厝邊">
+    <meta name="twitter:description" content="即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。📍 由基隆氣象站開發、整合之簡易版網站。">
+    <meta name="twitter:image" content="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png">
+
+    <style>
+        /* ===== BASE TOKENS (晴天 / 預設) ===== */
+        :root {
+            /* Sky palette */
+            --sky-top:    #4A90D9;   /* 天頂藍 */
+            --sky-mid:    #74B9E8;   /* 中層天藍 */
+            --sky-low:    #C8E8F8;   /* 地平線淡藍 */
+
+            /* Surface */
+            --sand:       #EEF6FB;   /* 頁面底色 */
+            --cream:      #F5FAFE;   /* 卡片底色 */
+
+            /* Text */
+            --ink:        #0D2B45;   /* 主文字 */
+            --ink-light:  #2C5F82;   /* 次文字 */
+            --ink-faint:  #6E9AB5;   /* 提示文字 */
+
+            /* Accent (天氣藍) */
+            --ocean:      #1565A8;
+            --ocean-mid:  #2E86C1;
+            --ocean-light:#A8D5F0;
+            --seafoam:    #DDF0FB;
+
+            /* UI */
+            --border:       rgba(21,101,168,0.14);
+            --border-strong:rgba(21,101,168,0.28);
+            --card-bg:      rgba(255,255,255,0.78);
+            --shadow:    0 4px 24px rgba(14,68,120,0.13);
+            --shadow-sm: 0 1px 8px rgba(14,68,120,0.09);
+            --radius:    5px;
+            --radius-lg: 10px;
+            --font-body: 'Noto Sans TC', sans-serif;
+            --font-mono: 'DM Mono', monospace;
+
+            /* Accent stripe on active tab */
+            --tab-active-bg: linear-gradient(135deg, #1565A8 0%, #2E86C1 100%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 35%, var(--sky-low) 70%, var(--sand) 100%);
+            background-attachment: fixed;
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+            transition: background 1.8s ease, color 0.6s ease;
+        }
+
+        /* ===== WEATHER-ADAPTIVE BACKGROUNDS ===== */
+
+        /* 晴天 */
+        body.sunny {
+            background: linear-gradient(180deg,
+                #FFD95A 0%, #FFB830 8%, #62B8E8 28%,
+                #A8D8F0 60%, #DCF0FB 100%);
+            background-attachment: fixed;
+            --ocean: #0B5C9E;
+            --ocean-mid: #1E7FBB;
+            --ink: #0B2D4A;
+            --ink-light: #1A5280;
+            --card-bg: rgba(255,252,240,0.82);
+            --border: rgba(255,180,0,0.2);
+            --border-strong: rgba(255,160,0,0.35);
+            --seafoam: #FFF8E0;
+            --tab-active-bg: linear-gradient(135deg,#D97D00,#F5A623);
+        }
+
+        /* 夜晚 */
+        body.night {
+            background: linear-gradient(180deg,
+                #010912 0%, #061428 25%,
+                #0A2040 60%, #0D2B50 100%);
+            background-attachment: fixed;
+            --sand: #061428;
+            --cream: #0A1E35;
+            --ink: #C8DCF0;
+            --ink-light: #8AAEC8;
+            --ink-faint: #4A7090;
+            --ocean: #2980B9;
+            --ocean-mid: #5DADE2;
+            --border: rgba(100,160,220,0.14);
+            --border-strong: rgba(100,160,220,0.28);
+            --card-bg: rgba(8,20,40,0.82);
+            --seafoam: #0D1E32;
+            --tab-active-bg: linear-gradient(135deg,#1A3A60,#2E6DA4);
+        }
+
+        /* 多雲 */
+        body.cloudy {
+            background: linear-gradient(180deg,
+                #6B8CAE 0%, #8FAFC8 30%,
+                #B8CDD8 65%, #D5E3EA 100%);
+            background-attachment: fixed;
+            --ocean: #2C5F82;
+            --ocean-mid: #3D7FA8;
+            --card-bg: rgba(245,250,255,0.80);
+            --seafoam: #E0EAF2;
+            --tab-active-bg: linear-gradient(135deg,#2C5F82,#3D7FA8);
+        }
+
+        /* 雨天 */
+        body.rainy {
+            background: linear-gradient(180deg,
+                #1A2A3A 0%, #243444 30%,
+                #2C3E50 65%, #2E4055 100%);
+            background-attachment: fixed;
+            --sand: #1A2A3A;
+            --cream: #1E2F3E;
+            --ink: #C0D4E8;
+            --ink-light: #80A8C0;
+            --ink-faint: #4A6C84;
+            --ocean: #2E86C1;
+            --ocean-mid: #5DADE2;
+            --border: rgba(80,140,200,0.16);
+            --border-strong: rgba(80,140,200,0.30);
+            --card-bg: rgba(20,38,58,0.84);
+            --seafoam: #182535;
+            --tab-active-bg: linear-gradient(135deg,#1A4E7A,#2E86C1);
+        }
+
+        /* 雷雨 */
+        body.thunder {
+            background: linear-gradient(180deg,
+                #0A0A18 0%, #12121E 30%,
+                #1A1228 65%, #1E1530 100%);
+            background-attachment: fixed;
+            --sand: #0A0A18;
+            --cream: #10101E;
+            --ink: #B8C8E0;
+            --ink-light: #7090B0;
+            --ink-faint: #405870;
+            --ocean: #3A78C8;
+            --ocean-mid: #6090D8;
+            --border: rgba(80,120,200,0.18);
+            --border-strong: rgba(80,120,200,0.32);
+            --card-bg: rgba(8,8,22,0.86);
+            --seafoam: #0C0C1E;
+            --tab-active-bg: linear-gradient(135deg,#1A2A6A,#3A78C8);
+        }
+
+        /* 霧 */
+        body.foggy {
+            background: linear-gradient(180deg,
+                #B0BAC4 0%, #C8D2DC 30%,
+                #D8E0E8 65%, #E5EBF0 100%);
+            background-attachment: fixed;
+            --ocean: #4A708A;
+            --ocean-mid: #5C8AA8;
+            --card-bg: rgba(235,242,248,0.86);
+            --border: rgba(80,110,140,0.16);
+            --border-strong: rgba(80,110,140,0.28);
+            --ink: #2A3E50;
+            --ink-light: #3E5870;
+            --seafoam: #D0DCE8;
+            --tab-active-bg: linear-gradient(135deg,#4A708A,#5C8AA8);
+        }
+
+        /* Animated canvas */
+        #rainCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: none;
+        }
+        body.rainy #rainCanvas, body.thunder #rainCanvas { display: block; }
+
+        .stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            display: none;
+        }
+        /* Stars show only when body.night — set by JS when weather=晴 and hours 18-06 */
+        body.night .stars { display: block; }
+        .star {
+            position: absolute;
+            color: #FFE066;
+            font-size: 10px;
+            animation: twinkle linear infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.15; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* Layout wrapper */
+        .page-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 16px 0;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header — single row: logo-left | weather-right */
+        .site-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 16px;
+            margin-bottom: 12px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .header-right {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        /* Weather banner now lives inside the header */
+        #latestWeather {
+            flex: 1;
+            min-width: 0;
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            color: var(--ink-light);
+            font-family: var(--font-mono);
+            letter-spacing: 0.01em;
+            background: rgba(255,255,255,0.45);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--ocean-mid);
+            border-radius: var(--radius);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: border-color 1.8s ease;
+        }
+        body.sunny #latestWeather   { border-top-color: #F5A623; }
+        body.thunder #latestWeather { border-top-color: #6090D8; }
+        body.rainy #latestWeather   { border-top-color: #5DADE2; }
+        body.night #latestWeather   { border-top-color: #2E6DA4; }
+        body.foggy #latestWeather   { border-top-color: #5C8AA8; }
+        @media (max-width: 768px) {
+            #latestWeather { display: none; }   /* hidden on mobile; shown in banner below */
+        }
+        .site-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .title-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-strong);
+        }
+        .site-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: var(--ink);
+        }
+        .site-title .subtitle {
+            font-size: 0.7rem;
+            color: var(--ink-faint);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+        }
+
+        /* #latestWeather now defined inside .site-header block above */
+
+        /* Navigation tabs */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            margin-bottom: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 4px;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(8px);
+        }
+        .tab {
+            padding: 7px 14px;
+            cursor: pointer;
+            border-radius: var(--radius);
+            border: none;
+            background: transparent;
+            font-size: 0.82rem;
+            font-family: var(--font-body);
+            color: var(--ink-faint);
+            transition: all 0.18s ease;
+            white-space: nowrap;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+        .tab:hover {
+            background: var(--seafoam);
+            color: var(--ocean);
+        }
+        .tab.active {
+            background: var(--tab-active-bg);
+            color: #fff;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(14,68,120,0.28);
+        }
+
+        /* Tab content panels */
+        .tab-content {
+            display: none;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(8px);
+            flex: 1;
+            margin-bottom: 20px;
+        }
+        .tab-content.active { display: block; }
+
+        /* Section headings inside panels */
+        .section-title {
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            font-family: var(--font-mono);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--ink-light);
+            margin-bottom: 8px;
+            text-align: center;
+            letter-spacing: 0.03em;
+            font-family: var(--font-mono);
+        }
+
+        /* Image grids */
+        .image-grid, .marine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 12px;
+        }
+        .image-container {
+            background: var(--cream);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .image-container:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+        .image-container h3 {
+            padding: 8px 10px 6px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0;
+            background: rgba(255,255,255,0.5);
+            color: var(--ink-light);
+            text-align: left;
+            transition: background 1.8s ease, color 1.8s ease;
+        }
+        body.rainy .image-container h3,
+        body.thunder .image-container h3,
+        body.night .image-container h3 {
+            background: rgba(0,0,0,0.45);
+            color: #E8F0FA;
+        }
+        .image-container > img,
+        .image-container > iframe {
+            width: 100%;
+            height: 260px;
+            object-fit: contain;
+            border: none;
+            display: block;
+            background: var(--cream);
+        }
+        .image-container > iframe {
+            height: 260px;
+        }
+        #keelungCard .image-container > img { height: 300px; }
+
+        .surge-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            height: 260px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+        .surge-container img {
+            width: 100%;
+            object-fit: contain;
+        }
+
+        /* Chart grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .chart-container, .ranking-container {
+            background: var(--cream);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        /* Ranking table */
+        .ranking-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .ranking-buttons button {
+            background: transparent;
+            border: 1px solid var(--border-strong);
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-family: var(--font-body);
+            color: var(--ink-faint);
+            transition: all 0.18s ease;
+        }
+        .ranking-buttons button:hover {
+            border-color: var(--ocean-mid);
+            color: var(--ocean);
+        }
+        .ranking-buttons button.active {
+            background: var(--ocean);
+            border-color: var(--ocean);
+            color: #fff;
+        }
+        .ranking-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+        .ranking-container th {
+            background: var(--tab-active-bg);
+            color: #fff;
+            padding: 6px 4px;
+            font-weight: 500;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+        }
+        .ranking-container td {
+            padding: 5px 4px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            color: var(--ink-light);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+        .ranking-container tr:nth-child(even) td {
+            background: rgba(168,213,226,0.08);
+        }
+        .ranking-container th:nth-child(4), .ranking-container td:nth-child(4) {
+            border-right: 1.5px solid var(--border-strong);
+        }
+
+        /* Forecast iframes */
+        .forecast-container, .coastal-container, .yunbot-container {
+            width: 100%;
+            height: 520px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .forecast-container iframe, .coastal-container iframe, .yunbot-container iframe {
+            width: 100%; height: 100%; border: none;
+        }
+
+        /* Map */
+        #map {
+            width: 100%; height: 100%;
+            border-radius: var(--radius);
+            position: relative; z-index: 1;
+        }
+        .map-hint {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            margin-top: 8px;
+            font-family: var(--font-mono);
+        }
+
+        /* Climate section */
+        .climate-header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .climate-header h2 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--ocean);
+            letter-spacing: 0.04em;
+        }
+        .climate-header small {
+            font-size: 0.72rem;
+            color: var(--ink-faint);
+            font-family: var(--font-mono);
+        }
+
+        /* Climate extreme tables */
+        .extreme-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .extreme-table th {
+            background: var(--tab-active-bg);
+            color: #fff;
+            padding: 7px 6px;
+            font-weight: 500;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            border: none;
+        }
+        .extreme-table td {
+            padding: 6px;
+            border: 1px solid var(--border);
+            text-align: center;
+            color: var(--ink-light);
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+        }
+        .extreme-table tr:nth-child(odd) td { background: rgba(168,213,226,0.06); }
+        .climate-note {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--ink-faint);
+            margin-top: 16px;
+            font-family: var(--font-mono);
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* About & related links */
+        #aboutKeelung p, #relatedLinks p {
+            font-size: 0.875rem;
+            line-height: 1.75;
+            color: var(--ink-light);
+            margin-bottom: 12px;
+        }
+        #relatedLinks ul {
+            list-style: none;
+            padding: 0;
+        }
+        #relatedLinks ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        #relatedLinks ul li:last-child { border-bottom: none; }
+        #relatedLinks ul li a {
+            color: var(--ocean-mid);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.15s;
+        }
+        #relatedLinks ul li a:hover { color: var(--ocean); text-decoration: underline; }
+        #relatedLinks ul li a::before {
+            content: '→  ';
+            font-family: var(--font-mono);
+            color: var(--ink-faint);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ink);
+            color: var(--cream);
+            padding: 8px 20px;
+            border-radius: 20px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+            box-shadow: var(--shadow);
+        }
+        .toast.show { opacity: 1; }
+
+        /* Footer */
+        footer {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            padding: 16px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--ink-faint);
+            backdrop-filter: blur(8px);
+            position: relative;
+            z-index: 1;
+        }
+        footer p { margin: 4px 0; line-height: 1.6; }
+        footer a { color: var(--ocean-mid); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .social-icons { display: inline-flex; gap: 12px; margin: 4px 0; }
+        .social-icons a {
+            font-size: 1rem;
+            color: var(--ink-faint);
+            transition: color 0.15s;
+        }
+        .social-icons a:hover { color: var(--ocean); }
+        .footer-divider {
+            display: inline-block;
+            margin: 0 6px;
+            color: var(--border-strong);
+        }
+
+
+        /* Mobile-only weather strip */
+        .latest-weather-mobile {
+            display: none;
+            padding: 8px 14px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--ink-light);
+            font-family: var(--font-mono);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-top: 2px solid var(--ocean-mid);
+            border-radius: var(--radius);
+            text-align: center;
+            backdrop-filter: blur(8px);
+            transition: border-color 1.8s ease;
+        }
+        body.sunny .latest-weather-mobile   { border-top-color: #F5A623; }
+        body.thunder .latest-weather-mobile { border-top-color: #6090D8; }
+        body.rainy .latest-weather-mobile   { border-top-color: #5DADE2; }
+        body.night .latest-weather-mobile   { border-top-color: #2E6DA4; }
+        body.foggy .latest-weather-mobile   { border-top-color: #5C8AA8; }
+        @media (max-width: 768px) {
+            .latest-weather-mobile { display: block; }
+        }
+
+        /* ===== HAMBURGER MENU ===== */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 38px; height: 38px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius);
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: background 0.18s;
+            flex-shrink: 0;
+        }
+        .hamburger-btn:hover { background: var(--seafoam); }
+        .hamburger-btn .bar {
+            width: 18px; height: 2px;
+            background: var(--ink);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        /* Animated X state */
+        .hamburger-btn.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger-btn.open .bar:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger-btn.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* Mobile nav drawer */
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 500;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .mobile-nav-overlay.visible { opacity: 1; }
+
+        .mobile-nav-drawer {
+            position: fixed;
+            top: 0; right: 0;
+            width: 240px; height: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border-left: 1px solid var(--border-strong);
+            z-index: 501;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.18);
+        }
+        .mobile-nav-drawer.open { transform: translateX(0); }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .drawer-header-title {
+            font-size: 0.72rem;
+            font-family: var(--font-mono);
+            color: var(--ink-faint);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .drawer-close-btn {
+            width: 28px; height: 28px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--ink-faint);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .drawer-close-btn:hover { background: var(--seafoam); color: var(--ocean); }
+
+        .drawer-tabs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .drawer-tab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 11px 14px;
+            border: none;
+            background: transparent;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-family: var(--font-body);
+            color: var(--ink-light);
+            text-align: left;
+            transition: all 0.18s;
+            margin-bottom: 2px;
+        }
+        .drawer-tab:hover { background: var(--seafoam); color: var(--ocean); }
+        .drawer-tab.active {
+            background: var(--tab-active-bg);
+            color: #fff;
+            font-weight: 500;
+        }
+        .drawer-tab .tab-emoji { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        .drawer-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: var(--ink-faint);
+            font-family: var(--font-mono);
+            text-align: center;
+        }
+
+        /* Current tab indicator (shown in header on mobile) */
+        .current-tab-label {
+            display: none;
+            font-size: 0.8rem;
+            color: var(--ink-faint);
+            font-family: var(--font-mono);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 769px) {
+            .image-grid, .marine-grid { grid-template-columns: repeat(4, 1fr); }
+            .chart-grid { grid-template-columns: repeat(2, 1fr); }
+            .chart-container, .ranking-container, #map { height: 280px; }
+            .hamburger-btn { display: none !important; }
+            .mobile-nav-overlay, .mobile-nav-drawer { display: none !important; }
+        }
+        @media (max-width: 768px) {
+            .page-wrapper { padding: 12px 10px 0; }
+            /* Hide desktop tabs, show hamburger */
+            .tabs { display: none; }
+            .hamburger-btn { display: flex; }
+            .current-tab-label { display: block; }
+            .mobile-nav-overlay { display: block; }
+
+            .chart-grid { grid-template-columns: 1fr; }
+            .chart-container, .ranking-container, #map { height: 230px; }
+            .ranking-container { height: 210px; overflow-y: auto; }
+            .image-grid, .marine-grid { grid-template-columns: 1fr; }
+            .image-container > img, .image-container > iframe { height: 230px; }
+            #keelungCard .image-container > img { height: 260px; }
+            .surge-container { height: 230px; }
+            .forecast-container, .yunbot-container, .coastal-container { height: 420px; }
+            .site-title h1 { font-size: 1.05rem; }
+            .site-header { padding: 12px 0 10px; }
+        }
+
+
+        /* ===== WEATHER SWITCHER ===== */
+        .weather-switcher {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px 16px;
+            margin-top: 4px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 10;
+        }
+        .switcher-label {
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            color: var(--ink-faint);
+            letter-spacing: 0.06em;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+        .switcher-btn {
+            border: 1px solid var(--border-strong);
+            background: transparent;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.78rem;
+            font-family: var(--font-body);
+            color: var(--ink-light);
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+        .switcher-btn:hover { background: var(--seafoam); border-color: var(--ocean-mid); }
+        .switcher-btn.sw-active {
+            background: var(--tab-active-bg);
+            border-color: transparent;
+            color: #fff;
+            font-weight: 500;
+        }
+        .switcher-btn.sw-auto { font-style: italic; }
+
+        /* ===== BACK TO TOP ===== */
+        #backToTopBtn {
+            position: fixed;
+            bottom: 28px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--tab-active-bg);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(27,79,114,0.35);
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            z-index: 200;
+        }
+        #backToTopBtn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        #backToTopBtn:hover {
+            background: var(--ocean-mid);
+            box-shadow: 0 6px 20px rgba(27,79,114,0.45);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <canvas id="rainCanvas"></canvas>
+    <div class="stars"></div>
+
+    <!-- Mobile nav overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+    <!-- Mobile nav drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+        <div class="drawer-header">
+            <span class="drawer-header-title">選單 Menu</span>
+            <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="關閉選單">✕</button>
+        </div>
+        <div class="drawer-tabs">
+            <button class="drawer-tab active" data-tab="weatherCharts"><span class="tab-emoji">☁️</span>天氣圖資</button>
+            <button class="drawer-tab" data-tab="marine"><span class="tab-emoji">🌊</span>海象圖資</button>
+            <button class="drawer-tab" data-tab="charts"><span class="tab-emoji">🏞️</span>基隆北海岸</button>
+            <button class="drawer-tab" data-tab="forecast"><span class="tab-emoji">⛅</span>天氣預報</button>
+            <button class="drawer-tab" data-tab="coastal"><span class="tab-emoji">🛳️</span>鄉鎮沿海預報</button>
+            <button class="drawer-tab" data-tab="climate"><span class="tab-emoji">📈</span>基隆氣候</button>
+            <button class="drawer-tab" data-tab="keelungCard"><span class="tab-emoji">🎏</span>氣象站圖卡</button>
+            <button class="drawer-tab" data-tab="relatedLinks"><span class="tab-emoji">🔗</span>相關網站</button>
+        </div>
+        <div class="drawer-footer">基隆氣象站 · 山海好厝邊</div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Header: logo left | weather banner center | hamburger right -->
+        <header class="site-header">
+            <div class="header-left site-title">
+                <img src="https://keelungcwa.github.io/keelungcwa/images/keelung_logo.png" alt="基隆氣象站" class="title-logo">
+                <div>
+                    <h1>基隆氣象站</h1>
+                    <div class="subtitle">山海好厝邊 · Keelung Weather Station</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- 最新天氣觀測 (desktop: inline in header) -->
+                <div id="latestWeather">載入基隆最新天氣資料中⋯</div>
+                <span class="current-tab-label" id="currentTabLabel">天氣圖資</span>
+                <button class="hamburger-btn" id="hamburgerBtn" aria-label="開啟選單">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile-only weather strip (shown below header on small screens) -->
+        <div id="latestWeatherMobile" class="latest-weather-mobile">載入中⋯</div>
+
+        <!-- 分頁選單 -->
+        <nav class="tabs">
+            <div class="tab active" data-tab="weatherCharts">天氣圖資 ☁️</div>
+            <div class="tab" data-tab="marine">海象圖資 🌊</div>
+            <div class="tab" data-tab="charts">基隆北海岸 🏞️</div>
+            <div class="tab" data-tab="forecast">天氣預報 ⛅</div>
+            <div class="tab" data-tab="coastal">鄉鎮沿海預報 🛳️</div>
+            <div class="tab" data-tab="climate">基隆氣候 📈</div>
+            <div class="tab" data-tab="keelungCard">氣象站圖卡 🎏</div>
+            <div class="tab" data-tab="relatedLinks">相關網站 🔗</div>
+        </nav>
+
+        <!-- 第 1 頁面：天氣圖資 -->
+        <div id="weatherCharts" class="tab-content active">
+            <p class="section-title">天氣圖資</p>
+            <div class="image-grid">
+                <div class="image-container">
+                    <h3>雷達回波圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/radar/CV1_TW_1000_forPreview.png" alt="基隆地區最新雷達回波圖">
+                </div>
+                <div class="image-container">
+                    <h3>累積雨量圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/rainfall/QZJ_forPreview.jpg" alt="基隆地區累積雨量圖">
+                </div>
+                <div class="image-container">
+                    <h3>真實色衛星雲圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/satellite/TWI_TRGB_1000/TWI_TRGB_1000.jpg" alt="真實色衛星雲圖">
+                </div>
+                <div class="image-container">
+                    <h3>風速流場</h3>
+                    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=mm&metricTemp=°C&metricWind=m/s&zoom=5&overlay=wind&product=ecmwf&level=surface&lat=24.036&lon=120.595&pressure=true&message=true" frameborder="0" allow="geolocation"></iframe>
+                </div>
+                <div class="image-container">
+                    <h3>溫度分布圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/temperature/temp_forPreview.jpg" alt="基隆地區溫度分布圖">
+                </div>
+                <div class="image-container">
+                    <h3>閃電觀測圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/lightning/lightning_s.jpg" alt="基隆地區閃電觀測圖">
+                </div>
+                <div class="image-container">
+                    <h3>地面天氣圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/fcst_img/FI04.png" alt="地面天氣圖">
+                </div>
+                <div class="image-container">
+                    <h3>定量降水預報</h3>
+                    <img src="https://www.cwa.gov.tw/Data/fcst_img/QPF_ChFcstPrecip_12_12.png" alt="定量降水預報">
+                </div>
+            </div>
+        </div>
+
+        <!-- 第 2 頁面：海象圖資 -->
+        <div id="marine" class="tab-content">
+            <p class="section-title">海象圖資</p>
+            <div class="marine-grid">
+                <div class="image-container">
+                    <h3>沿海與異常浪預報</h3>
+                    <img src="https://raw.githubusercontent.com/keelungcwa/CWA_Waverisk/refs/heads/main/images/CWA_waverisk.png" alt="基隆北海岸沿海與異常浪預報">
+                </div>
+                <div class="image-container">
+                    <h3>潮浪柱狀圖</h3>
+                    <div class="surge-container">
+                        <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan01.png" alt="潮浪柱狀圖 01">
+                        <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan02.png" alt="潮浪柱狀圖 02">
+                    </div>
+                </div>
+                <div class="image-container">
+                    <h3>潮浪監測地圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/warning/Surge_Swell/Surge_Wave_Taiwan03.png" alt="潮浪監測地圖">
+                </div>
+                <div class="image-container">
+                    <h3>波浪分析圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/fcst_img/FI12_Small.jpg" alt="波浪分析圖">
+                </div>
+                <div class="image-container">
+                    <h3>浪高預報</h3>
+                    <img id="waveGif" src="https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/202503/2025032500/2025032500.gif" alt="波浪動態圖">
+                </div>
+                <div class="image-container">
+                    <h3>海溫預報與海流</h3>
+                    <iframe src="https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=°C&metricWind=default&zoom=6&overlay=sst&product=ecmwfAnalysis&level=surface&lat=23.546&lon=121.482" frameborder="0" allow="geolocation"></iframe>
+                </div>
+                <div class="image-container">
+                    <h3>潮高預報圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/marine/tide_height_CH/cht/3day/1516_1.png" alt="基隆潮位圖">
+                </div>
+                <div class="image-container">
+                    <h3>滿潮預報圖</h3>
+                    <img src="https://www.cwa.gov.tw/Data/marine/tide_predict/full_0.png" alt="滿潮預報圖">
+                </div>
+            </div>
+        </div>
+
+        <!-- 第 3 頁面：基隆北海岸 -->
+        <div id="charts" class="tab-content">
+            <p class="section-title">基隆北海岸 觀測資料</p>
+            <div class="chart-grid">
+                <div class="ranking-container">
+                    <h3>觀測排行榜 🏆</h3>
+                    <div class="ranking-buttons">
+                        <button onclick="updateRankingTable('maxTemperature')" class="active">最高溫(℃)</button>
+                        <button onclick="updateRankingTable('minTemperature')">最低溫(℃)</button>
+                        <button onclick="updateRankingTable('windSpeed')">風速(m/s)</button>
+                        <button onclick="updateRankingTable('precipitation')">雨量(mm)</button>
+                    </div>
+                    <table id="rankingTable">
+                        <thead>
+                            <tr>
+                                <th>今日</th><th>站點</th><th>數值</th><th>時間</th>
+                                <th>現在</th><th>站點</th><th>數值</th><th>時間</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="chart-container">
+                    <h3>測站最新天氣地圖 🗺️</h3>
+                    <div id="map"></div>
+                </div>
+                <div class="chart-container">
+                    <h3>溫度時序圖 🌡️</h3>
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>濕度時序圖 💧</h3>
+                    <canvas id="humidityChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>風速時序圖 💨</h3>
+                    <canvas id="windSpeedChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>雨量分布圖 🌧️</h3>
+                    <canvas id="precipitationChart"></canvas>
+                </div>
+            </div>
+            <p class="map-hint">點擊地圖標記開啟／關閉測站數據</p>
+        </div>
+
+        <!-- 第 4 頁面：天氣預報 -->
+        <div id="forecast" class="tab-content">
+            <p class="section-title">天氣預報</p>
+            <div class="forecast-container">
+                <iframe src="https://www.cwa.gov.tw/V8/C/W/County/County.html?CID=10017" frameborder="0"></iframe>
+            </div>
+        </div>
+
+        <!-- 第 5 頁面：鄉鎮沿海預報 -->
+        <div id="coastal" class="tab-content">
+            <p class="section-title">鄉鎮沿海預報</p>
+            <div class="coastal-container">
+                <iframe src="https://www.cwa.gov.tw/V8/C/M/TownCoastal/TownCoastal.html?cID=10017&pointID=1001705C01" frameborder="0" allow="geolocation"></iframe>
+            </div>
+        </div>
+
+        <!-- 第 6 頁面：基隆氣候 -->
+        <div id="climate" class="tab-content">
+            <div class="climate-header">
+                <h2>基隆氣象站 氣候統計</h2>
+                <small>數據來源：交通部中央氣象署</small>
+            </div>
+            <div class="chart-grid">
+                <div class="chart-container">
+                    <h3>氣溫 (℃) 🌡️　年平均：22.8</h3>
+                    <canvas id="climateTempChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>降雨量 (mm) 🌧️　年平均總計：3590</h3>
+                    <canvas id="climateRainChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>日照時數與雨日 ☀️</h3>
+                    <canvas id="climateSunRainChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3>風速 (m/s) 💨</h3>
+                    <canvas id="climateWindChart"></canvas>
+                </div>
+                <div class="chart-container" style="height: auto; min-height: 280px;">
+                    <h3 style="text-align:left; margin-bottom:12px;">日累積降水量極值 (mm) ☔</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="extreme-table">
+                            <thead>
+                                <tr>
+                                    <th>排序</th><th>降水量(mm)</th><th>日期</th><th>天氣系統</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>408.0</td><td>2024/10/03</td><td>山陀兒颱風</td></tr>
+                                <tr><td>2</td><td>351.3</td><td>1980/09/23</td><td>熱帶性低氣壓外圍環流</td></tr>
+                                <tr><td>3</td><td>345.5</td><td>2010/09/24</td><td>鋒面</td></tr>
+                                <tr><td>4</td><td>337.6</td><td>2017/06/02</td><td>梅雨鋒面</td></tr>
+                                <tr><td>5</td><td>323.5</td><td>1968/09/30</td><td>艾琳颱風</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="chart-container" style="height: auto; min-height: 280px;">
+                    <h3 style="text-align:left; margin-bottom:12px;">海警期間累積降水量極值 (mm) 🌊</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="extreme-table">
+                            <thead>
+                                <tr>
+                                    <th>排序</th><th>降水量(mm)</th><th>起迄日期</th><th>颱風名稱</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>856.8</td><td>1987/10/22 ~ 10/27</td><td>琳恩颱風</td></tr>
+                                <tr><td>2</td><td>760.0</td><td>2024/09/29 ~ 10/04</td><td>山陀兒颱風</td></tr>
+                                <tr><td>3</td><td>656.5</td><td>1998/10/25 ~ 10/27</td><td>芭比絲颱風</td></tr>
+                                <tr><td>4</td><td>619.1</td><td>2000/10/30 ~ 11/01</td><td>象神颱風</td></tr>
+                                <tr><td>5</td><td>577.0</td><td>2001/09/13 ~ 09/19</td><td>納莉颱風</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <p class="climate-note">* 統計期間為 1991年至 2020年之 30 年平均值，風速統計期間為 1950年至 2022年。</p>
+        </div>
+
+        <!-- 第 7 頁面：氣象站圖卡 -->
+        <div id="keelungCard" class="tab-content">
+            <p class="section-title">氣象站圖卡</p>
+            <div class="image-grid">
+                <div class="image-container">
+                    <h3>圖卡 1</h3>
+                    <img src="https://keelungcwa.github.io/keelungcwa/images/image1.png" alt="圖卡1">
+                </div>
+                <div class="image-container">
+                    <h3>圖卡 2</h3>
+                    <img src="https://keelungcwa.github.io/keelungcwa/images/image2.png" alt="圖卡2">
+                </div>
+                <div class="image-container">
+                    <h3>圖卡 3</h3>
+                    <img src="https://keelungcwa.github.io/keelungcwa/images/image3.jpg" alt="圖卡3">
+                </div>
+                <div class="image-container">
+                    <h3>圖卡 4</h3>
+                    <img src="https://keelungcwa.github.io/keelungcwa/images/image4.jpg" alt="圖卡4">
+                </div>
+            </div>
+        </div>
+
+        <!-- 關於本網站 -->
+        <div id="aboutKeelung" class="tab-content">
+            <p class="section-title">關於本網站</p>
+            <p>本網站專注於<strong>基隆北海岸的海氣象資訊</strong>，致力於提供<strong>簡易清晰、便民實用</strong>的內容，供機關與民眾參考。精選來自各單位的重要氣象產品，整合呈現，避免過度複雜的設計，提升資訊可讀性與使用效率，並確保<strong>可於手機、電腦等不同載具順暢閱覽</strong>。期盼成為基隆北海岸最值得信賴的山海氣象好厝邊。</p>
+            <p>請注意，<strong>部分產品可能並非來自中央氣象署</strong>，使用時請審慎評估其適用性，並<strong>以本署官方預報為準</strong>，以確保資訊的準確性與可靠性。</p>
+            <p style="color: var(--ink-faint); font-family: var(--font-mono); font-size: 0.8rem;">作者：基隆氣象站 鄧乃誠</p>
+        </div>
+
+        <!-- 相關網站 -->
+        <div id="relatedLinks" class="tab-content">
+            <p class="section-title">相關網站</p>
+            <p>以下為與基隆氣象站相關的網站連結，提供更多氣象資訊與服務：</p>
+            <ul>
+                <li><a href="https://keelungcwa.github.io/CWA_Waverisk/" target="_blank">基隆北海岸沿海與異常波浪（瘋狗浪）預報</a></li>
+                <li><a href="https://keelungcwa.github.io/marine_moniter/" target="_blank">臺灣即時海象監測</a></li>
+                <li><a href="https://codis.cwa.gov.tw/" target="_blank">CODiS 氣候觀測資料查詢服務 | 交通部中央氣象署</a></li>
+                <li><a href="https://hdps.cwa.gov.tw/hdps/" target="_blank">資料申購 | 交通部中央氣象署</a></li>
+                <li><a href="https://www.cwa.gov.tw/V8/C/A/organ/46694.html" target="_blank">基隆氣象站 | 交通部中央氣象署</a></li>
+                <li><a href="https://watch.ncdr.nat.gov.tw/watch_page_typhoon_v2" target="_blank">颱風監測 | NCDR 國家災害防救科技中心</a></li>
+                <li><a href="https://wwtf.twport.com.tw/twport/display/Realtime_Panel_Port_2024.html?1" target="_blank">基隆港 海氣象資訊 | 商港海氣象資訊系統</a></li>
+                <li><a href="https://keelungcwa.github.io/CWA_WeatherStation_SOP/" target="_blank">氣象站轉型監測預報席作業 SOP — 異常狀況處理互動決策樹</a></li>
+            </ul>
+        </div>
+    </div><!-- end page-wrapper -->
+
+    <!-- Weather Switcher -->
+    <div class="weather-switcher">
+        <span class="switcher-label">🎨 背景預覽</span>
+        <button class="switcher-btn sw-auto sw-active" onclick="setManualWeather(null)">自動連動</button>
+        <button class="switcher-btn" onclick="setManualWeather('sunny')">☀️ 晴天</button>
+        <button class="switcher-btn" onclick="setManualWeather('cloudy')">☁️ 多雲</button>
+        <button class="switcher-btn" onclick="setManualWeather('rainy')">🌧️ 雨天</button>
+        <button class="switcher-btn" onclick="setManualWeather('thunder')">⛈️ 雷雨</button>
+        <button class="switcher-btn" onclick="setManualWeather('night')">🌙 夜晚</button>
+        <button class="switcher-btn" onclick="setManualWeather('foggy')">🌫️ 霧</button>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div style="margin-bottom: 6px;">
+            <a id="aboutLink" href="javascript:void(0)" data-tab="aboutKeelung">關於本網站</a>
+            <span class="footer-divider">·</span>
+            <span class="social-icons">
+                <a href="https://www.facebook.com/KeelungWeatherStation" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://maps.app.goo.gl/KTwwkkC9LxZeFJhF8" target="_blank" title="Google Maps"><i class="fas fa-map-marker-alt"></i></a>
+                <a href="https://www.instagram.com/cwa_weather/" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.youtube.com/@cwbwebtv" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
+            </span>
+        </div>
+        <p>服務時間 09:00–17:00　地址 200基隆市仁愛區港西街6號6樓（海港大樓）　電話 (02)2422-4240　Email <a href="mailto:keelung@cwa.gov.tw">keelung@cwa.gov.tw</a></p>
+        <p style="margin-top:6px; color: var(--ink-faint, #8A8A8A);">© 中央氣象署基隆氣象站　版權所有，轉載請註明出處</p>
+    </footer>
+
+    <!-- 結構化數據 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "基隆氣象站 山海好厝邊",
+        "url": "https://keelungcwa.github.io/",
+        "description": "即時掌握基隆北海岸天氣資訊，簡單清晰，方便閱覽。由基隆氣象站開發、整合之簡易版網站。",
+        "publisher": {
+            "@type": "Organization",
+            "name": "中央氣象署基隆氣象站",
+            "url": "https://www.cwa.gov.tw/"
+        }
+    }
+    </script>
+
+    <script>
+        // ===== Stars =====
+        function createStars() {
+            const starsContainer = document.querySelector('.stars');
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.animationDuration = `${Math.random() * 1.5 + 1.5}s`;
+                star.innerHTML = '★';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // ===== Rain canvas =====
+        const canvas = document.getElementById('rainCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const rainDrops = [];
+        let animationFrame = null;
+
+        function RainDrop() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * -canvas.height;
+            this.length = Math.random() * 15 + 8;
+            this.speed = Math.random() * 4 + 4;
+        }
+        RainDrop.prototype.update = function() {
+            this.y += this.speed;
+            if (this.y > canvas.height) { this.y = -this.length; this.x = Math.random() * canvas.width; }
+        };
+        RainDrop.prototype.draw = function(ctx) {
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x, this.y + this.length);
+            ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        };
+
+        // ── Thunder: ambient sky-flash (no bolts) ──
+        let thunderFlashTimer = 0;
+        let thunderFlashInterval = 0;   // randomised each time
+        let thunderFlashPhase = 'idle'; // idle | bright | dim1 | dim2
+        let thunderFlashProgress = 0;
+
+        function scheduleNextFlash() {
+            // Next flash: 4–14 seconds from now
+            thunderFlashInterval = 4000 + Math.random() * 10000;
+            thunderFlashTimer = 0;
+            thunderFlashPhase = 'idle';
+        }
+        scheduleNextFlash();
+
+        // Flash envelope: a quick bright pulse, then a faint echo ~150 ms later
+        const FLASH_BRIGHT_MS  = 80;   // initial bright burst
+        const FLASH_GAP_MS     = 120;  // dark gap
+        const FLASH_ECHO_MS    = 60;   // faint second pulse
+        const FLASH_FADE_MS    = 200;  // fade out
+
+        function tickThunderFlash(dt_ms, overlay) {
+            thunderFlashTimer += dt_ms;
+            if (thunderFlashPhase === 'idle') {
+                if (thunderFlashTimer >= thunderFlashInterval) {
+                    thunderFlashPhase = 'bright';
+                    thunderFlashProgress = 0;
+                }
+                overlay.style.opacity = '0';
+                return;
+            }
+            thunderFlashProgress += dt_ms;
+            let alpha = 0;
+            if (thunderFlashPhase === 'bright') {
+                alpha = 0.55 * (1 - thunderFlashProgress / FLASH_BRIGHT_MS);
+                if (thunderFlashProgress >= FLASH_BRIGHT_MS) {
+                    thunderFlashPhase = 'gap';
+                    thunderFlashProgress = 0;
+                }
+            } else if (thunderFlashPhase === 'gap') {
+                alpha = 0;
+                if (thunderFlashProgress >= FLASH_GAP_MS) {
+                    thunderFlashPhase = 'echo';
+                    thunderFlashProgress = 0;
+                }
+            } else if (thunderFlashPhase === 'echo') {
+                alpha = 0.25 * (1 - thunderFlashProgress / FLASH_ECHO_MS);
+                if (thunderFlashProgress >= FLASH_ECHO_MS) {
+                    thunderFlashPhase = 'fade';
+                    thunderFlashProgress = 0;
+                }
+            } else if (thunderFlashPhase === 'fade') {
+                alpha = 0;
+                if (thunderFlashProgress >= FLASH_FADE_MS) {
+                    scheduleNextFlash();
+                }
+            }
+            overlay.style.opacity = String(Math.max(0, alpha));
+        }
+
+        // Flash overlay element (reuse or create)
+        function getFlashOverlay() {
+            let el = document.getElementById('thunderFlashOverlay');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'thunderFlashOverlay';
+                el.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;' +
+                    'background:rgba(200,220,255,1);opacity:0;transition:none;';
+                document.body.appendChild(el);
+            }
+            return el;
+        }
+
+        function startAnimation(isThunder) {
+            if (rainDrops.length === 0) for (let i = 0; i < 80; i++) rainDrops.push(new RainDrop());
+            const flashOverlay = isThunder ? getFlashOverlay() : null;
+            if (isThunder) scheduleNextFlash();
+            let lastTime = performance.now();
+            function animate() {
+                const currentTime = performance.now();
+                const dt_ms = currentTime - lastTime;
+                lastTime = currentTime;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (document.body.classList.contains('rainy') || document.body.classList.contains('thunder')) {
+                    rainDrops.forEach(d => { d.update(); d.draw(ctx); });
+                }
+                if (isThunder && document.body.classList.contains('thunder')) {
+                    tickThunderFlash(dt_ms, flashOverlay);
+                } else if (flashOverlay) {
+                    flashOverlay.style.opacity = '0';
+                }
+                animationFrame = requestAnimationFrame(animate);
+            }
+            if (!animationFrame) animate();
+        }
+        function stopAnimation() {
+            if (animationFrame) { cancelAnimationFrame(animationFrame); animationFrame = null; }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            rainDrops.length = 0;
+        }
+        window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+
+        // ===== Charts & Map state =====
+        let tempChart, humidityChart, windSpeedChart, precipitationChart;
+        let mapInstance = null;
+        let allData = {};
+        let visibleStations = ['基隆', '淡水', '七堵', '富貴角', '大坪', '鼻頭角', '三貂角', '瑞芳', '汐止'];
+        const allStations = [
+            '基隆', '淡水', '七堵', '大武崙', '野柳', '淡水觀海', '石門', '水湳洞', '八斗子', '六塊厝', '田寮',
+            '大坪', '基隆嶼', '白沙灣', '三貂角', '鼻頭角', '澳底', '泰平', '雙溪', '汐止', '暖暖',
+            '富貴角', '福隆', '彭佳嶼', '金山', '三和', '瑞芳', '五分山', '國一S001K', '國一S006K', '國三S004K',
+            '國三S007K', '國三N002K'
+        ];
+        const colors = [
+            'rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(75, 192, 192)', 'rgb(153, 102, 255)',
+            'rgb(255, 159, 64)', 'rgb(255, 205, 86)', 'rgb(0, 128, 0)', 'rgb(255, 99, 71)',
+            'rgb(144, 238, 144)', 'rgb(173, 216, 230)'
+        ];
+        const stations = {
+            '基隆': [25.133314, 121.740475], '淡水': [25.164889, 121.448906], '七堵': [25.094819, 121.71713],
+            '大武崙': [25.166676, 121.706993], '野柳': [25.20703, 121.690021], '淡水觀海': [25.184591, 121.408616],
+            '石門': [25.273672, 121.601198], '水湳洞': [25.123695, 121.862238], '八斗子': [25.144754, 121.79167],
+            '六塊厝': [25.24, 121.4481], '田寮': [25.2698, 121.4886], '大坪': [25.165914, 121.632969],
+            '基隆嶼': [25.19141, 121.78391], '白沙灣': [25.283128, 121.519058], '三貂角': [25.007606, 122.002058],
+            '鼻頭角': [25.129036, 121.923372], '澳底': [25.0552, 121.9253], '泰平': [24.971197, 121.823711],
+            '雙溪': [25.036003, 121.864242], '汐止': [25.066881, 121.658778], '暖暖': [25.0957, 121.7403],
+            '富貴角': [25.2900, 121.5361], '福隆': [25.0200, 121.9389], '彭佳嶼': [25.627975, 122.079744],
+            '金山': [25.223628, 121.643967], '三和': [25.233153, 121.595236], '瑞芳': [25.1086, 121.8111],
+            '五分山': [25.071182, 121.781205]
+        };
+
+        function getWeatherEmoji(weather, hours) {
+            if (weather === '晴') return (hours >= 18 || hours < 6) ? '🌙' : '☀️';
+            if (weather.includes('雷')) return '⛈️';
+            if (weather.includes('雨')) return '🌧️';
+            if (weather.includes('霧') || weather.includes('靄') || weather.includes('霾')) return '🌫️';
+            if (weather.includes('多雲')) return '🌥️';
+            if (weather.includes('陰')) return '☁️';
+            return '❓';
+        }
+
+        function showToast(message) {
+            let toast = document.querySelector('.toast');
+            if (!toast) { toast = document.createElement('div'); toast.className = 'toast'; document.body.appendChild(toast); }
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        /* updateLatestWeather() defined in override block above */
+
+        const tabLabels = {
+            weatherCharts: '天氣圖資 ☁️', marine: '海象圖資 🌊',
+            charts: '基隆北海岸 🏞️', forecast: '天氣預報 ⛅',
+            coastal: '鄉鎮沿海預報 🛳️', climate: '基隆氣候 📈',
+            keelungCard: '氣象站圖卡 🎏', relatedLinks: '相關網站 🔗',
+            aboutKeelung: '關於本網站 📋',
+        };
+
+        function showTab(tabId) {
+            try {
+                // Sync desktop tabs
+                document.querySelectorAll('.tab').forEach(t =>
+                    t.classList.toggle('active', t.dataset.tab === tabId));
+                // Sync drawer tabs
+                document.querySelectorAll('.drawer-tab').forEach(t =>
+                    t.classList.toggle('active', t.dataset.tab === tabId));
+                // Show content panel
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                const contentElement = document.getElementById(tabId);
+                if (!contentElement) { showToast('無法載入分頁內容，請稍後重試'); return; }
+                contentElement.classList.add('active');
+                // Update mobile header label
+                const lbl = document.getElementById('currentTabLabel');
+                if (lbl) lbl.textContent = tabLabels[tabId] || '';
+                // Close drawer
+                closeDrawer();
+                if (tabId === 'charts') {
+                    setTimeout(() => { if (mapInstance) mapInstance.invalidateSize(); else initMap(); }, 100);
+                }
+                if (tabId === 'climate') setTimeout(initClimateCharts, 200);
+            } catch (error) { showToast('切換分頁失敗，請稍後重試'); }
+        }
+
+        function updateWaveGif() {
+            const now = new Date();
+            const baseUrl = 'https://watch.ncdr.nat.gov.tw/00_Wxmap/5F20_WL_WAVE/';
+            const targetTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+            const year = targetTime.getFullYear();
+            const month = String(targetTime.getMonth() + 1).padStart(2, '0');
+            const day = String(targetTime.getDate()).padStart(2, '0');
+            const hours = targetTime.getHours();
+            const closestHour = String(Math.floor(hours / 6) * 6).padStart(2, '0');
+            const timeString = `${year}${month}${day}${closestHour}`;
+            document.getElementById('waveGif').src = `${baseUrl}${year}${month}/${timeString}/${timeString}.gif`;
+        }
+
+        function loadAndPlotData() {
+            fetch('data/keelung_data.json')
+                .then(response => { if (!response.ok) throw new Error('無法載入 JSON 資料'); return response.json(); })
+                .then(data => {
+                    allData = {};
+                    data.forEach((row, index) => {
+                        const stationName = row.station_name;
+                        if (allStations.includes(stationName)) {
+                            if (!allData[stationName]) allData[stationName] = [];
+                            const time = new Date(row.time);
+                            if (!isNaN(time.getTime())) {
+                                allData[stationName].push({
+                                    Time: time,
+                                    AirTemperature: row.weather_elements.AirTemperature != null && row.weather_elements.AirTemperature !== -99 && row.weather_elements.AirTemperature >= -10 && row.weather_elements.AirTemperature <= 50 ? parseFloat(row.weather_elements.AirTemperature) : null,
+                                    RelativeHumidity: row.weather_elements.RelativeHumidity != null ? parseFloat(row.weather_elements.RelativeHumidity) : null,
+                                    WindSpeed: row.weather_elements.WindSpeed != null ? parseFloat(row.weather_elements.WindSpeed) : null,
+                                    Precipitation: row.weather_elements.Precipitation != null && parseFloat(row.weather_elements.Precipitation) >= 0 ? parseFloat(row.weather_elements.Precipitation) : null,
+                                    Weather: row.weather_elements.Weather || '未知'
+                                });
+                            }
+                        }
+                    });
+                    updateLatestWeather();
+                    updateRankingTable('maxTemperature');
+                    initMap();
+                    const now = new Date();
+                    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                    plotCharts(twentyFourHoursAgo, now);
+                })
+                .catch(error => {
+                    console.error('載入 JSON 資料失敗:', error);
+                    document.getElementById('latestWeather').textContent = '暫無基隆天氣資料';
+                    document.getElementById('rankingTable').querySelector('tbody').innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
+                    stopAnimation(); showToast('載入 JSON 資料失敗，請稍後重試');
+                });
+            updateWaveGif();
+            setInterval(updateWaveGif, 6 * 60 * 60 * 1000);
+        }
+
+        function updateRankingTable(sortType = 'maxTemperature') {
+            const tableBody = document.getElementById('rankingTable').querySelector('tbody');
+            tableBody.innerHTML = '';
+            document.querySelectorAll('.ranking-buttons button').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.includes(sortType === 'maxTemperature' ? '最高溫' : sortType === 'minTemperature' ? '最低溫' : sortType === 'windSpeed' ? '風速' : '雨量'))
+                    btn.classList.add('active');
+            });
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+            const todayRanking = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const todayData = allData[station].filter(d => d.Time >= today && d.Time < tomorrow);
+                    if (todayData.length > 0) {
+                        const value = sortType === 'maxTemperature' ? Math.max(...todayData.map(d => d.AirTemperature).filter(v => v != null)) :
+                                      sortType === 'minTemperature' ? Math.min(...todayData.map(d => d.AirTemperature).filter(v => v != null)) :
+                                      sortType === 'windSpeed' ? Math.max(...todayData.map(d => d.WindSpeed).filter(v => v != null)) :
+                                      Math.max(...todayData.map(d => d.Precipitation).filter(v => v != null && v >= 0));
+                        const dataPoint = todayData.find(d =>
+                            (sortType === 'maxTemperature' && d.AirTemperature === value) ||
+                            (sortType === 'minTemperature' && d.AirTemperature === value) ||
+                            (sortType === 'windSpeed' && d.WindSpeed === value) ||
+                            (sortType === 'precipitation' && d.Precipitation === value)
+                        );
+                        if (value != null && !isNaN(value) && dataPoint) todayRanking.push({ station, value, time: dataPoint.Time });
+                    }
+                }
+            });
+            const nowRanking = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const latestData = allData[station].sort((a, b) => b.Time - a.Time)[0];
+                    const value = sortType === 'maxTemperature' ? latestData.AirTemperature :
+                                  sortType === 'minTemperature' ? latestData.AirTemperature :
+                                  sortType === 'windSpeed' ? latestData.WindSpeed :
+                                  latestData.Precipitation;
+                    if (value != null && (sortType !== 'precipitation' || value >= 0))
+                        nowRanking.push({ station, value, time: latestData.Time });
+                }
+            });
+            const sortedTodayRanking = todayRanking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5);
+            const sortedNowRanking = nowRanking.sort((a, b) => sortType === 'minTemperature' ? a.value - b.value : b.value - a.value).slice(0, 5);
+            for (let i = 0; i < 5; i++) {
+                const todayItem = sortedTodayRanking[i] || {};
+                const nowItem = sortedNowRanking[i] || {};
+                const todayTimeStr = todayItem.time ? `${todayItem.time.getHours().toString().padStart(2, '0')}:${todayItem.time.getMinutes().toString().padStart(2, '0')}` : '-';
+                const nowTimeStr = nowItem.time ? `${nowItem.time.getHours().toString().padStart(2, '0')}:${nowItem.time.getMinutes().toString().padStart(2, '0')}` : '-';
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${i + 1}</td><td>${todayItem.station || '-'}</td><td>${todayItem.value != null ? todayItem.value.toFixed(1) : '-'}</td><td>${todayTimeStr}</td><td>${i + 1}</td><td>${nowItem.station || '-'}</td><td>${nowItem.value != null ? nowItem.value.toFixed(1) : '-'}</td><td>${nowTimeStr}</td>`;
+                tableBody.appendChild(row);
+            }
+            if (tableBody.innerHTML === '') tableBody.innerHTML = '<tr><td colspan="8">暫無排行資料</td></tr>';
+        }
+
+        function plotCharts(twentyFourHoursAgo, now) {
+            const allTimes = Object.values(allData).flat().map(d => d.Time.getTime());
+            const uniqueTimes = [...new Set(allTimes)].filter(t => !isNaN(t));
+            const chartType = uniqueTimes.length > 1 ? 'line' : 'bar';
+            const datasets = { temperature: [], humidity: [], windSpeed: [], precipitation: [] };
+            visibleStations.forEach((station, index) => {
+                if (allData[station] && allData[station].length > 0) {
+                    const stationData = allData[station];
+                    datasets.temperature.push({ label: station, data: stationData.map(item => ({ x: item.Time, y: item.AirTemperature })), borderColor: colors[index % colors.length], tension: 0.1, borderWidth: 2, fill: false, pointRadius: 1.5 });
+                    datasets.humidity.push({ label: station, data: stationData.map(item => ({ x: item.Time, y: item.RelativeHumidity })), borderColor: colors[index % colors.length], tension: 0.1, borderWidth: 2, fill: false, pointRadius: 1.5 });
+                    datasets.windSpeed.push({ label: station, data: stationData.map(item => ({ x: item.Time, y: item.WindSpeed })), borderColor: colors[index % colors.length], tension: 0.1, borderWidth: 2, fill: false, pointRadius: 1.5 });
+                }
+            });
+            const latestPrecipitation = [];
+            allStations.forEach(station => {
+                if (allData[station] && allData[station].length > 0) {
+                    const latestData = allData[station].sort((a, b) => b.Time - a.Time)[0];
+                    const precipitation = latestData.Precipitation || 0;
+                    let backgroundColor = 'rgb(54, 162, 235)';
+                    if (precipitation > 200) backgroundColor = 'rgb(255, 99, 132)';
+                    else if (precipitation > 80) backgroundColor = 'rgb(255, 165, 0)';
+                    else if (precipitation > 40) backgroundColor = 'rgb(255, 215, 0)';
+                    latestPrecipitation.push({ station, value: precipitation, color: backgroundColor });
+                }
+            });
+            latestPrecipitation.sort((a, b) => b.value - a.value);
+            const top15 = latestPrecipitation.slice(0, 15);
+            datasets.precipitation = top15.map(item => ({ label: item.station, data: [{ x: item.station, y: item.value }], backgroundColor: item.color, borderColor: item.color, borderWidth: 3 }));
+
+            if (tempChart) tempChart.destroy();
+            if (humidityChart) humidityChart.destroy();
+            if (windSpeedChart) windSpeedChart.destroy();
+            if (precipitationChart) precipitationChart.destroy();
+
+            const chartOptions = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { tooltip: { enabled: true }, legend: { position: 'right', labels: { font: { size: 10 }, pointStyle: 'circle' } } }
+            };
+            tempChart = new Chart(document.getElementById('temperatureChart'), {
+                type: chartType, data: { datasets: datasets.temperature },
+                options: { ...chartOptions, scales: { x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 12 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 10 } } }, y: { title: { display: true, text: '溫度 (°C)', font: { size: 12 } }, ticks: { font: { size: 10 }, stepSize: 2 } } } }
+            });
+            humidityChart = new Chart(document.getElementById('humidityChart'), {
+                type: chartType, data: { datasets: datasets.humidity },
+                options: { ...chartOptions, scales: { x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 12 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 10 } } }, y: { title: { display: true, text: '相對濕度 (%)', font: { size: 12 } }, min: 20, max: 100, ticks: { font: { size: 10 } } } } }
+            });
+            windSpeedChart = new Chart(document.getElementById('windSpeedChart'), {
+                type: chartType, data: { datasets: datasets.windSpeed },
+                options: { ...chartOptions, scales: { x: { type: 'time', time: { unit: chartType === 'line' ? 'hour' : 'minute', displayFormats: { hour: 'MM-dd HH:mm', minute: 'MM-dd HH:mm' } }, title: { display: true, text: '時間', font: { size: 12 } }, min: twentyFourHoursAgo, max: now, ticks: { font: { size: 10 } } }, y: { title: { display: true, text: '風速 (m/s)', font: { size: 12 } }, min: 0, ticks: { font: { size: 10 } } } } }
+            });
+            precipitationChart = new Chart(document.getElementById('precipitationChart'), {
+                type: 'bar', data: { datasets: datasets.precipitation },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: '站點', font: { size: 12 } }, ticks: { font: { size: 10 } } }, y: { title: { display: true, text: '累積雨量 (mm)', font: { size: 12 } }, beginAtZero: true, min: 0, ticks: { font: { size: 10 } } } } }
+            });
+        }
+
+        function initMap() {
+            if (mapInstance) mapInstance.remove();
+            mapInstance = L.map('map').setView([25.128, 121.742], 10);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap contributors' }).addTo(mapInstance);
+            const zoomLevel = mapInstance.getZoom();
+            const markerSize = 30, fontSize = 20, anchorY = 30 * (zoomLevel / 10);
+            for (let [name, [lat, lng]] of Object.entries(stations)) {
+                if (allStations.includes(name)) {
+                    let markerIcon;
+                    const stationData = allData[name];
+                    let popupContent = `<b>${name}</b><br>無數據`;
+                    if (stationData && stationData.length > 0) {
+                        const latestData = stationData.sort((a, b) => b.Time - a.Time)[0];
+                        const weather = latestData.Weather || '未知';
+                        const hours = latestData.Time.getHours();
+                        let displayWeather = weather;
+                        if (weather === '晴') displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+                        const emoji = getWeatherEmoji(weather, hours);
+                        const timeStr = `${latestData.Time.getHours().toString().padStart(2, '0')}:${latestData.Time.getMinutes().toString().padStart(2, '0')}`;
+                        const isVisible = visibleStations.includes(name);
+                        popupContent = `<b>${name}</b><br>天氣: ${displayWeather} ${emoji}<br>氣溫: ${latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A'} °C<br>濕度: ${latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A'} %<br>風速: ${latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A'} m/s<br>雨量: ${latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A'} mm<br>更新時間: ${timeStr}`;
+                        markerIcon = L.divIcon({ className: 'custom-marker', html: `<div style="font-size:${fontSize}px;transform:translate(-50%,-${anchorY}px);${isVisible ? 'background:rgba(255,255,255,0.7);border-radius:50%;padding:2px;' : ''}">${emoji}</div>`, iconSize: [markerSize, markerSize], iconAnchor: [markerSize / 2, anchorY] });
+                    } else {
+                        markerIcon = L.divIcon({ className: 'custom-marker', html: `<div style="width:10px;height:10px;background:#808080;border-radius:50%;transform:translate(-50%,-50%);"></div>`, iconSize: [10, 10], iconAnchor: [5, 5] });
+                    }
+                    L.marker([lat, lng], { icon: markerIcon }).addTo(mapInstance).bindPopup(popupContent).on('click', () => toggleStation(name));
+                }
+            }
+            setTimeout(() => mapInstance.invalidateSize(), 100);
+        }
+
+        function toggleStation(station) {
+            try {
+                if (visibleStations.includes(station)) { visibleStations = visibleStations.filter(s => s !== station); showToast(`已移除測站：${station}`); }
+                else { visibleStations.push(station); showToast(`已添加測站：${station}`); }
+                const now = new Date();
+                const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                plotCharts(twentyFourHoursAgo, now);
+                initMap();
+            } catch (error) { showToast('切換測站失敗，請稍後重試'); }
+        }
+
+        // ===== Climate charts =====
+        const climateMonths = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+        const climateStats = {
+            temp: { max: [18.4,19.1,21.0,24.7,28.0,31.2,33.3,32.5,29.8,26.1,23.6,20.1], avg: [16.1,16.4,18.1,21.6,24.8,27.6,29.5,29.1,27.2,24.2,21.5,18.0], min: [14.2,14.3,15.7,19.0,22.3,25.0,26.7,26.5,25.0,22.4,19.6,16.1] },
+            rain: [327.8,349.8,274.4,211.1,284.1,290.4,119.5,211.4,390.1,377.6,396.9,356.6],
+            sunshine: [52.6,57.9,80.6,91.2,111.9,138.4,229.2,208.2,147.4,85.7,65.3,48.5],
+            rainDays: [19.6,17.9,18.7,16.0,16.1,14.8,8.5,11.6,15.2,17.1,18.6,19.5],
+            wind: { avgMax: [23.0,22.3,20.0,17.6,18.3,19.5,36.3,43.0,35.0,31.5,25.8,16.0], gustMax: [31.8,28.0,29.0,26.8,30.0,33.9,59.5,54.0,67.0,49.6,36.7,28.5] }
+        };
+        let climateChartsInitialized = false;
+
+        function initClimateCharts() {
+            if (climateChartsInitialized) return;
+            const commonOptions = {
+                responsive: true, maintainAspectRatio: false,
+                layout: { padding: { left: 20, right: 15, top: 10, bottom: 20 } },
+                scales: {
+                    x: { display: true, grid: { display: false }, ticks: { autoSkip: false, font: { size: window.innerWidth > 768 ? 13 : 11 }, padding: 10 } },
+                    y: { display: true, grid: { display: true, drawOnChartArea: true, drawTicks: true }, ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 }, padding: 12 } }
+                },
+                plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: window.innerWidth > 768 ? 13 : 11 }, padding: 15 } } }
+            };
+            new Chart(document.getElementById('climateTempChart'), {
+                type: 'line', data: { labels: climateMonths, datasets: [
+                    { label: '最高', data: climateStats.temp.max, borderColor: '#e74c3c', tension: 0.3 },
+                    { label: '平均', data: climateStats.temp.avg, borderColor: '#2ecc71', tension: 0.3 },
+                    { label: '最低', data: climateStats.temp.min, borderColor: '#3498db', tension: 0.3 }
+                ]}, options: commonOptions
+            });
+            new Chart(document.getElementById('climateRainChart'), {
+                type: 'bar', data: { labels: ['', ...climateMonths, ''], datasets: [{ label: '雨量(mm)', data: [null, ...climateStats.rain, null], backgroundColor: 'rgba(46,134,193,0.65)', borderColor: 'rgba(46,134,193,1)', borderWidth: 1, borderRadius: 4, categoryPercentage: 0.9 }] },
+                options: { ...commonOptions, scales: { x: { ...commonOptions.scales.x, ticks: { ...commonOptions.scales.x.ticks, callback: function(value, index) { return (index >= 1 && index <= 12) ? climateMonths[index-1] : ''; } } }, y: { beginAtZero: true, title: { display: true, text: 'mm', font: { size: 13 } }, ticks: { font: { size: window.innerWidth > 768 ? 12 : 10 } } } }, plugins: { legend: { display: false } } }
+            });
+            new Chart(document.getElementById('climateSunRainChart'), {
+                type: 'line', data: { labels: climateMonths, datasets: [
+                    { label: '日照時數 (小時)', data: climateStats.sunshine, borderColor: '#f1c40f', tension: 0.3, yAxisID: 'y' },
+                    { label: '雨日 (天)', data: climateStats.rainDays, borderColor: '#95a5a6', tension: 0.3, yAxisID: 'y1' }
+                ]},
+                options: { ...commonOptions, scales: { x: commonOptions.scales.x, y: { type: 'linear', position: 'left', title: { display: true, text: '小時', font: { size: 13 } }, grid: { drawOnChartArea: false } }, y1: { type: 'linear', position: 'right', title: { display: true, text: '天數', font: { size: 13 } }, grid: { drawOnChartArea: true } } } }
+            });
+            new Chart(document.getElementById('climateWindChart'), {
+                type: 'line', data: { labels: climateMonths, datasets: [
+                    { label: '平均最大風速', data: climateStats.wind.avgMax, borderColor: '#9b59b6', borderDash: [5,5], tension: 0.3 },
+                    { label: '瞬間最大陣風', data: climateStats.wind.gustMax, borderColor: '#e67e22', borderWidth: 2, tension: 0.3 }
+                ]}, options: commonOptions
+            });
+            climateChartsInitialized = true;
+        }
+
+        // ===== Manual Weather Override =====
+        let manualWeatherMode = null;  // null = auto (follow real data)
+
+        function setManualWeather(mode) {
+            manualWeatherMode = mode;
+            // Update switcher button states
+            document.querySelectorAll('.switcher-btn').forEach(btn => {
+                btn.classList.remove('sw-active');
+            });
+            if (mode === null) {
+                document.querySelector('.sw-auto').classList.add('sw-active');
+                // Revert to data-driven weather
+                updateLatestWeather();
+            } else {
+                // Find the clicked button and activate it
+                document.querySelectorAll('.switcher-btn').forEach(btn => {
+                    if (btn.getAttribute('onclick') === `setManualWeather('${mode}')`) {
+                        btn.classList.add('sw-active');
+                    }
+                });
+                applyWeatherClass(mode);
+            }
+        }
+
+        function applyWeatherClass(mode) {
+            // Remove all weather classes and reapply
+            document.body.classList.remove('sunny','night','cloudy','rainy','thunder','foggy');
+            if (mode) document.body.classList.add(mode);
+            // Restart canvas animation accordingly
+            stopAnimation();
+            if (mode === 'rainy')   startAnimation(false);
+            if (mode === 'thunder') startAnimation(true);
+            // Recreate stars if night
+            createStars();
+        }
+
+        // Patch updateLatestWeather to respect manual override
+        const _origUpdateLatestWeather = updateLatestWeather;
+        function updateLatestWeather() {
+            const keelungData = allData['基隆'];
+            if (!keelungData || keelungData.length === 0) {
+                document.getElementById('latestWeather').textContent = document.getElementById('latestWeatherMobile').textContent = '暫無基隆天氣資料';
+                if (!manualWeatherMode) { document.body.className = 'cloudy'; stopAnimation(); }
+                showToast('暫無基隆天氣資料，請稍後重試'); return;
+            }
+            const latestData = keelungData.sort((a, b) => b.Time - a.Time)[0];
+            const date = latestData.Time;
+            const hours = date.getHours();
+            const weather = latestData.Weather || '未知';
+            const temperature = latestData.AirTemperature != null ? latestData.AirTemperature.toFixed(1) : 'N/A';
+            const humidity = latestData.RelativeHumidity != null ? latestData.RelativeHumidity.toFixed(0) : 'N/A';
+            const precipitation = latestData.Precipitation != null ? latestData.Precipitation.toFixed(1) : 'N/A';
+            const windSpeed = latestData.WindSpeed != null ? latestData.WindSpeed.toFixed(1) : 'N/A';
+            const timeStr = `${hours.toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            let displayWeather = weather;
+            if (weather === '晴') displayWeather = (hours >= 18 || hours < 6) ? '晚晴' : '晴';
+            const weatherEmoji = getWeatherEmoji(weather, hours);
+            const weekdays = ['日','一','二','三','四','五','六'];
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}年${(now.getMonth()+1).toString().padStart(2,'0')}月${now.getDate().toString().padStart(2,'0')}日 (${weekdays[now.getDay()]})`;
+            const html = `${dateStr}　${displayWeather} ${weatherEmoji}　氣溫 ${temperature}°C　濕度 ${humidity}%　雨量 ${precipitation} mm　風速 ${windSpeed} m/s　(${timeStr})`;
+            document.getElementById('latestWeather').innerHTML =
+            document.getElementById('latestWeatherMobile').innerHTML = html;
+            // Only change background if not manually overridden
+            if (!manualWeatherMode) {
+                const weatherClass = weather.includes('雷') ? 'thunder' :
+                    weather.includes('雨') ? 'rainy' :
+                    weather === '晴' && (hours >= 18 || hours < 6) ? 'night' :
+                    weather === '晴' ? 'sunny' :
+                    weather.includes('多雲') || weather.includes('陰') ? 'cloudy' :
+                    weather.includes('霧') || weather.includes('靄') || weather.includes('霾') ? 'foggy' : '';
+                document.body.className = weatherClass;
+                stopAnimation();
+                if (weatherClass === 'thunder') startAnimation(true);
+                else if (weatherClass === 'rainy') startAnimation(false);
+                if (weatherClass === 'night') createStars();
+            }
+        }
+
+                // ===== Hamburger / Drawer =====
+        function openDrawer() {
+            document.getElementById('mobileNavOverlay').classList.add('visible');
+            document.getElementById('mobileNavDrawer').classList.add('open');
+            document.getElementById('hamburgerBtn').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeDrawer() {
+            document.getElementById('mobileNavOverlay').classList.remove('visible');
+            document.getElementById('mobileNavDrawer').classList.remove('open');
+            document.getElementById('hamburgerBtn').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // ===== Init =====
+        let isInitialized = false;
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isInitialized) return;
+            isInitialized = true;
+            createStars();
+
+            // Desktop tabs
+            document.querySelectorAll('.tab').forEach(tab =>
+                tab.addEventListener('click', () => showTab(tab.dataset.tab)));
+
+            // Drawer tabs
+            document.querySelectorAll('.drawer-tab').forEach(tab =>
+                tab.addEventListener('click', () => showTab(tab.dataset.tab)));
+
+            // Hamburger controls
+            document.getElementById('hamburgerBtn').addEventListener('click', openDrawer);
+            document.getElementById('drawerCloseBtn').addEventListener('click', closeDrawer);
+            document.getElementById('mobileNavOverlay').addEventListener('click', closeDrawer);
+
+            // Swipe right to close drawer
+            let _touchStartX = 0;
+            document.getElementById('mobileNavDrawer').addEventListener('touchstart', e => {
+                _touchStartX = e.touches[0].clientX;
+            }, { passive: true });
+            document.getElementById('mobileNavDrawer').addEventListener('touchend', e => {
+                if (e.changedTouches[0].clientX - _touchStartX > 60) closeDrawer();
+            }, { passive: true });
+
+            // Back to top button
+            const backToTop = document.getElementById('backToTopBtn');
+            window.addEventListener('scroll', () => {
+                backToTop.classList.toggle('visible', window.scrollY > 300);
+            });
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            const aboutLink = document.getElementById('aboutLink');
+            if (aboutLink) aboutLink.addEventListener('click', () => showTab('aboutKeelung'));
+            loadAndPlotData();
+            if (document.getElementById('charts').classList.contains('active')) initMap();
+        });
+    </script>
+    <!-- Back to top -->
+    <button id="backToTopBtn" aria-label="回到頂部" title="回到頂部">↑</button>
+
+</body>
+</html>
